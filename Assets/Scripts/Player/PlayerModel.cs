@@ -36,4 +36,9 @@ public class PlayerModel : MonoBehaviour
         _isDetectable = !_isDetectable;
         _onSpin?.Invoke();
     }
+    public void Spin(bool doSpin)
+    {
+        _isDetectable = !doSpin;
+        _onSpin?.Invoke();
+    }
 }

@@ -1645,7 +1645,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 6614964496581297733}
-  - component: {fileID: 7896581398056301655}
   - component: {fileID: 7896581398056301658}
   - component: {fileID: 7896581398056301657}
   - component: {fileID: 7896581398056301656}
@@ -1657,26 +1656,6 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &7896581398056301655
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7896581398056301654}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 95be9591deede294c8c73c651d6c354d, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  target: {fileID: 467448064}
-  securityCamera: {fileID: 304960758}
-  alertImage: {fileID: 1984198204}
-  detectionRange: 10
-  detectionAngle: 90
-  obstaclesMask:
-    serializedVersion: 2
-    m_Bits: 8
 --- !u!114 &7896581398056301656
 MonoBehaviour:
   m_ObjectHideFlags: 0
