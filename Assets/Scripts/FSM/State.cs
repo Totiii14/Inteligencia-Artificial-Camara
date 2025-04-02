@@ -7,7 +7,7 @@ public class State
     protected FSM _fsm;
     protected Dictionary<PlayerStates, State> transitions = new Dictionary<PlayerStates, State>();
 
-    public virtual void Awake() { Debug.Log("Awake state: " + this.GetType().ToString()); }
+    public virtual void Awake() { }
     public virtual void Execute() { }
     public virtual void Sleep() { }
 
