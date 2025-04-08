@@ -11,7 +11,11 @@ public class SteeringEntity : MonoBehaviour
 
     Vector3 desiredVelocity;
 
+    public Vector3 DesiredVelocity { get => desiredVelocity; set => desiredVelocity = value; }
+
     Rigidbody rb;
+
+    ObstacleAvoid obs;
 
     public enum SteeringMode
     {
@@ -23,6 +27,7 @@ public class SteeringEntity : MonoBehaviour
 
     void Start()
     {
+        obs = GetComponent<ObstacleAvoid>();
         rb = GetComponent<Rigidbody>();
         Flee flee = new(rb, target.transform, maxVelocity);
         Seek seek = new(rb, target.transform, maxVelocity);
@@ -48,18 +53,28 @@ public class SteeringEntity : MonoBehaviour
 
     void Update()
     {
-        desiredVelocity = currentSteering.MoveDirection();
-        transform.forward = rb.velocity;
+        if (obs.IsObstacle == false)
+        {
+            desiredVelocity = currentSteering.MoveDirection();
+            transform.forward = rb.velocity;
+        }
+        else
+        {
+            rb.velocity = desiredVelocity.normalized * maxVelocity;
+            transform.forward = desiredVelocity.normalized;
+
+            //transform.forward = rb.velocity;
+        }
     }
 
-    private void OnDrawGizmos()
-    {
-        Gizmos.color = Color.green;
-        Gizmos.DrawLine(rb.position, rb.position + rb.velocity * 3);
+    //private void OnDrawGizmos()
+    //{
+    //    Gizmos.color = Color.green;
+    //    Gizmos.DrawLine(rb.position, rb.position + rb.velocity * 3);
 
-        Gizmos.color = Color.blue;
-        Gizmos.DrawLine(rb.position, rb.position + desiredVelocity);
+    //    Gizmos.color = Color.blue;
+    //    Gizmos.DrawLine(rb.position, rb.position + desiredVelocity);
 
-        Gizmos.DrawWireSphere(target.position + target.velocity * timePrediction * Vector3.Distance(rb.position, target.position) * 0.1f, 2);
-    }
+    //    Gizmos.DrawWireSphere(target.position + target.velocity * timePrediction * Vector3.Distance(rb.position, target.position) * 0.1f, 2);
+    //}
 }
