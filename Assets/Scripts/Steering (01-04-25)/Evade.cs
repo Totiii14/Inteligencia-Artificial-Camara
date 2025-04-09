@@ -22,7 +22,6 @@ public class Evade : ISteering
         Vector3 directionForce = desiredVelocity - rb.velocity;
         directionForce.y = 0;
         directionForce = Vector3.ClampMagnitude(directionForce, maxVelocity);
-        rb.AddForce(directionForce, ForceMode.Acceleration);
 
         return directionForce;
     }

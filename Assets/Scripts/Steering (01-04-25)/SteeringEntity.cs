@@ -9,13 +9,14 @@ public class SteeringEntity : MonoBehaviour
     public SteeringMode mode;
     private ISteering currentSteering;
 
-    Vector3 desiredVelocity;
+    Vector3 steeringVelocity;
 
-    public Vector3 DesiredVelocity { get => desiredVelocity; set => desiredVelocity = value; }
+    public Vector3 SteeringVelocity { get => steeringVelocity; set => steeringVelocity = value; }
 
     Rigidbody rb;
 
     ObstacleAvoid obs;
+    //ExampleTeacher obstacleAv;
 
     public enum SteeringMode
     {
@@ -27,6 +28,7 @@ public class SteeringEntity : MonoBehaviour
 
     void Start()
     {
+        //obstacleAv = GetComponent<ExampleTeacher>();
         obs = GetComponent<ObstacleAvoid>();
         rb = GetComponent<Rigidbody>();
         Flee flee = new(rb, target.transform, maxVelocity);
@@ -55,14 +57,15 @@ public class SteeringEntity : MonoBehaviour
     {
         if (obs.IsObstacle == false)
         {
-            desiredVelocity = currentSteering.MoveDirection();
+            steeringVelocity = currentSteering.MoveDirection();
+            //steeringVelocity += obstacleAv.Avoid() * steeringVelocity.magnitude;
+            rb.AddForce(steeringVelocity, ForceMode.Acceleration);
             transform.forward = rb.velocity;
         }
         else
         {
-            rb.velocity = desiredVelocity.normalized * maxVelocity;
-            transform.forward = desiredVelocity.normalized;
-
+            rb.velocity = steeringVelocity.normalized * maxVelocity;
+            transform.forward = steeringVelocity.normalized;
             //transform.forward = rb.velocity;
         }
     }

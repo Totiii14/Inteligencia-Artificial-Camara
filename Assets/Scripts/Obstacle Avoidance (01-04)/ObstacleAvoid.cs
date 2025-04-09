@@ -35,7 +35,7 @@ public class ObstacleAvoid : MonoBehaviour
         {
             isObstacle = true;
             SteeringEntity collEntity = GetComponent<SteeringEntity>();
-            collEntity.DesiredVelocity = NewDirection();
+            collEntity.SteeringVelocity = NewDirection();
         }
         else
             isObstacle = false;
