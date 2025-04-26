@@ -5,19 +5,21 @@ using UnityEngine;
 public class EnemyPatrol : MonoBehaviour
 {
     [SerializeField] List<GameObject> patrolPath;
+    [SerializeField] GameObject enemy;
     [SerializeField] private int maxVelocity;
     [SerializeField] private float distancePoint = 1f;
     [SerializeField] private float pauseTime = 2f;
 
 
-    private Rigidbody rb;
-    private int currentPatrolIndex = 0;
-    public bool IsPause { get; set; }
-    private bool isPatrollingForward = true;
+    private Rigidbody rbEnemy;
+    [SerializeField] private int currentPatrolIndex = 0;
+    [field: SerializeField] public bool IsPause { get; set; }
+    [field: SerializeField] public bool IsPatrolPause { get; set; } 
+    [SerializeField] private bool isPatrollingForward = true;
 
     private void Awake()
     {
-        rb = GetComponent<Rigidbody>();
+        rbEnemy = enemy.GetComponent<Rigidbody>();
     }
 
     public void Patrol()
@@ -28,20 +30,27 @@ public class EnemyPatrol : MonoBehaviour
         {
             Transform currentTarget = patrolPath[currentPatrolIndex].transform;
 
-            Vector3 direction = (currentTarget.position - transform.position).normalized * maxVelocity;
+            Vector3 direction = (currentTarget.position - enemy.transform.position).normalized * maxVelocity;
             direction.y = 0;
 
-            rb.velocity = direction;
+            rbEnemy.velocity = direction;
 
             if (direction != Vector3.zero)
             {
-                transform.forward = direction;
+                enemy.transform.forward = direction;
             }
 
-            float distanceToTarget = Vector3.Distance(transform.position, currentTarget.position);
+            float distanceToTarget = Vector3.Distance(enemy.transform.position, currentTarget.position);
             if (distanceToTarget < distancePoint)
             {
                 StartCoroutine(PauseBeforeNextPoint());
+            }
+        }
+        else
+        {
+            if (IsPatrolPause)
+            {
+                rbEnemy.velocity = Vector3.zero;
             }
         }
     }
@@ -51,6 +60,8 @@ public class EnemyPatrol : MonoBehaviour
         if (currentPatrolIndex == patrolPath.Count - 1 && isPatrollingForward)
         {
             IsPause = true;
+            IsPatrolPause = true;
+            rbEnemy.velocity = Vector3.zero; // <- me aseguro de frenarlo justo al llegar
             yield return new WaitForSeconds(pauseTime);
             IsPause = false;
             isPatrollingForward = false;
@@ -58,18 +69,22 @@ public class EnemyPatrol : MonoBehaviour
         else if (currentPatrolIndex == 0 && !isPatrollingForward)
         {
             IsPause = true;
+            IsPatrolPause = true;
+            rbEnemy.velocity = Vector3.zero; // <- me aseguro de frenarlo justo al llegar
             yield return new WaitForSeconds(pauseTime);
             IsPause = false;
             isPatrollingForward = true;
         }
-
-        if (isPatrollingForward)
+        else
         {
-            currentPatrolIndex = (currentPatrolIndex + 1) % patrolPath.Count;
-        }
-        else if (!isPatrollingForward)
-        {
-            currentPatrolIndex = (currentPatrolIndex - 1 + patrolPath.Count) % patrolPath.Count;
+            if (isPatrollingForward)
+            {
+                currentPatrolIndex++;
+            }
+            else
+            {
+                currentPatrolIndex--;
+            }
         }
     }
 

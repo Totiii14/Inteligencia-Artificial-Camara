@@ -40,7 +40,7 @@ public class SteeringEntity : MonoBehaviour
         obstacleAvoid = GetComponent<ObstacleAvoid>();
         rb = GetComponent<Rigidbody>();
         lineOfSight = GetComponent<LineOfSight>();
-        enemyPatrol = GetComponent<EnemyPatrol>();
+        enemyPatrol = GetComponentInParent<EnemyPatrol>();
     }
 
     void Start()
@@ -73,6 +73,7 @@ public class SteeringEntity : MonoBehaviour
         if (IsOnView)
         {
             enemyPatrol.IsPause = true;
+            enemyPatrol.IsPatrolPause = false; 
             if (obstacleAvoid.IsObstacle == false)
             {
                 steeringVelocity = currentSteering.MoveDirection();
@@ -95,15 +96,9 @@ public class SteeringEntity : MonoBehaviour
         else
         {
             enemyPatrol.IsPause = false;
+            enemyPatrol.IsPatrolPause = false; 
             enemyPatrol.Patrol();
         }
-    }
-
-    private IEnumerator StaySearching()
-    {
-        enemyPatrol.IsPause = true;
-        yield return new WaitForSeconds(3f);
-        enemyPatrol.IsPause = false;
     }
 
     //private void OnDrawGizmos()
