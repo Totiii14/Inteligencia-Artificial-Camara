@@ -1,17 +1,14 @@
 using System;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class PlayerModel : MonoBehaviour
 {
     Rigidbody _rb;
     public float speed;
-    bool _isDetectable = true;
 
     Action _onSpin = delegate { };
 
-    public bool IsDetectable => _isDetectable;
+    public bool IsDetectable { get; private set; }
 
     public Action OnSpin { get => _onSpin; set => _onSpin = value; }
 
@@ -27,18 +24,15 @@ public class PlayerModel : MonoBehaviour
         dir.y = _rb.velocity.y;
         _rb.velocity = dir;
     }
+
     public void Look(Vector3 dir)
     {
         transform.forward = dir;
     }
-    public void Spin()
-    {
-        _isDetectable = !_isDetectable;
-        _onSpin?.Invoke();
-    }
+    
     public void Spin(bool doSpin)
     {
-        _isDetectable = !doSpin;
+        IsDetectable = doSpin;
         _onSpin?.Invoke();
     }
 }

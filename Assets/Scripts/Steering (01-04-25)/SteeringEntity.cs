@@ -1,10 +1,14 @@
 using UnityEngine;
+using static UnityEditor.PlayerSettings;
 
 public class SteeringEntity : MonoBehaviour
 {
-    [SerializeField] Rigidbody target;
+    [SerializeField] Transform target;
+    [SerializeField] Rigidbody targetRb;
     [SerializeField] float maxVelocity;
     [SerializeField] float timePrediction;
+
+    public bool IsOnView;
 
     public SteeringMode mode;
     private ISteering currentSteering;
@@ -13,9 +17,11 @@ public class SteeringEntity : MonoBehaviour
 
     public Vector3 SteeringVelocity { get => steeringVelocity; set => steeringVelocity = value; }
 
-    Rigidbody rb;
 
-    ObstacleAvoid obs;
+    Rigidbody rb;
+    ObstacleAvoid obstacleAvoid;
+    LineOfSight lineOfSight;
+
     //ExampleTeacher obstacleAv;
 
     public enum SteeringMode
@@ -26,20 +32,24 @@ public class SteeringEntity : MonoBehaviour
         evade
     }
 
+    private void Awake()
+    {
+        obstacleAvoid = GetComponent<ObstacleAvoid>();
+        rb = GetComponent<Rigidbody>();
+        lineOfSight = GetComponent<LineOfSight>();
+    }
+
     void Start()
     {
         //obstacleAv = GetComponent<ExampleTeacher>();
-        obs = GetComponent<ObstacleAvoid>();
-        rb = GetComponent<Rigidbody>();
-        Flee flee = new(rb, target.transform, maxVelocity);
-        Seek seek = new(rb, target.transform, maxVelocity);
-        Persuit persuit = new(rb, target, maxVelocity, timePrediction);
-        Evade evade = new(rb, target, maxVelocity, timePrediction);
-
+        Flee flee = new(rb, targetRb.transform, maxVelocity);
+        Seek seek = new(rb, targetRb.transform, maxVelocity);
+        Persuit persuit = new(rb, targetRb, maxVelocity, timePrediction);
+        Evade evade = new(rb, targetRb, maxVelocity, timePrediction);
         switch (mode)
         {
             case SteeringMode.seek:
-                currentSteering = seek; 
+                currentSteering = seek;
                 break;
             case SteeringMode.flee:
                 currentSteering = flee;
@@ -52,20 +62,28 @@ public class SteeringEntity : MonoBehaviour
                 break;
         }
     }
-
     void Update()
     {
-        if (obs.IsObstacle == false)
+        IsOnView = targetRb && lineOfSight.CheckDistance(target) && lineOfSight.CheckAngle(target) && lineOfSight.CheckView(target);
+
+
+        if (obstacleAvoid.IsObstacle == false && IsOnView)
         {
             steeringVelocity = currentSteering.MoveDirection();
             //steeringVelocity += obstacleAv.Avoid() * steeringVelocity.magnitude;
             rb.AddForce(steeringVelocity, ForceMode.Acceleration);
-            transform.forward = rb.velocity;
+
+            if (rb.velocity != Vector3.zero)
+            {
+                transform.forward = rb.velocity;
+            }
         }
-        else
+        else if (obstacleAvoid.IsObstacle == true && IsOnView)
         {
             rb.velocity = steeringVelocity.normalized * maxVelocity;
-            transform.forward = steeringVelocity.normalized;
+
+            if (steeringVelocity != Vector3.zero)
+                transform.forward = steeringVelocity.normalized;
             //transform.forward = rb.velocity;
         }
     }

@@ -1,5 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class PlayerStateIdle : State
@@ -20,8 +18,8 @@ public class PlayerStateIdle : State
     {
         base.Execute();
 
-        var h = Input.GetAxis("Horizontal");
-        var v = Input.GetAxis("Vertical");
+        float h = Input.GetAxis("Horizontal");
+        float v = Input.GetAxis("Vertical");
         if (h != 0 || v != 0)
             _fsm.Transition(PlayerStates.MoveState);
 

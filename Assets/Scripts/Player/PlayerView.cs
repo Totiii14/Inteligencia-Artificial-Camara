@@ -1,7 +1,4 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
-using static UnityEditor.PlayerSettings;
 
 public class PlayerView : MonoBehaviour
 {
@@ -15,7 +12,6 @@ public class PlayerView : MonoBehaviour
         _rb = GetComponent<Rigidbody>();
         _model = GetComponent<PlayerModel>();
         _model.OnSpin += OnSpinAnimation;
-        OnSpinAnimation();
     }
 
     private void Update()

@@ -1,6 +1,4 @@
-using System.Collections;
 using System.Collections.Generic;
-using UnityEngine;
 
 public class State 
 {
@@ -16,6 +14,8 @@ public class State
         transitions[input] = newState;
     }
 
+    //las 2 formas de remover las transiciones
+
     public void RemoveTransition(PlayerStates input)
     {
         if (transitions.ContainsKey(input))
@@ -24,7 +24,7 @@ public class State
 
     public void RemoveTransition(State state)
     {
-        foreach (var pair in transitions)
+        foreach (KeyValuePair<PlayerStates, State> pair in transitions)
         {
             if (pair.Value == state)
             {

@@ -1,5 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class LineOfSight : MonoBehaviour
@@ -27,7 +25,7 @@ public class LineOfSight : MonoBehaviour
 
         Vector3 direction = target.position - securityCamera.position;
         float angle = Vector3.Angle(securityCamera.forward, direction);
-        return angle <= detectionRange / 2;
+        return angle <= detectionAngle / 2;
     }
 
     public bool CheckView(Transform target)

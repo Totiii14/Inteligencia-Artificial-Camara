@@ -42,20 +42,6 @@ public class PlayerController : MonoBehaviour
     private void Update()
     {
         fsm.Update();
-        //if (model.IsDetectable)
-        //{
-        //    var h = Input.GetAxis("Horizontal");
-        //    var v = Input.GetAxis("Vertical");
-
-        //    Vector3 dir = new Vector3(h, 0, v);
-        //    model.Move(dir.normalized);
-        //    if (h != 0 || v != 0) model.Look(dir);
-        //}
-        //else
-        //{
-        //    model.Move(Vector3.zero);
-        //}
-        //if (Input.GetKeyDown(KeyCode.Space)) model.Spin();
     }
 }
 
