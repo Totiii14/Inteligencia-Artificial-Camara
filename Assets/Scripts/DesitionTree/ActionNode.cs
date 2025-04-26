@@ -3,11 +3,11 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class ActionNode : IDesitionNode
+public class ActionNodeClass : IDesitionNode
 {
     private Action action;
 
-    public ActionNode(Action action)
+    public ActionNodeClass(Action action)
     {
         this.action = action;
     }

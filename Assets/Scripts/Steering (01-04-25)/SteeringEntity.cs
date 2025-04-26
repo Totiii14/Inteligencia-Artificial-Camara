@@ -1,12 +1,14 @@
+using System.Collections;
 using UnityEngine;
 using static UnityEditor.PlayerSettings;
 
 public class SteeringEntity : MonoBehaviour
 {
-    [SerializeField] Transform target;
+    [SerializeField] Transform Target;
     [SerializeField] Rigidbody targetRb;
     [SerializeField] float maxVelocity;
     [SerializeField] float timePrediction;
+
 
     public bool IsOnView;
 
@@ -21,6 +23,7 @@ public class SteeringEntity : MonoBehaviour
     Rigidbody rb;
     ObstacleAvoid obstacleAvoid;
     LineOfSight lineOfSight;
+    EnemyPatrol enemyPatrol;
 
     //ExampleTeacher obstacleAv;
 
@@ -37,6 +40,7 @@ public class SteeringEntity : MonoBehaviour
         obstacleAvoid = GetComponent<ObstacleAvoid>();
         rb = GetComponent<Rigidbody>();
         lineOfSight = GetComponent<LineOfSight>();
+        enemyPatrol = GetComponent<EnemyPatrol>();
     }
 
     void Start()
@@ -64,28 +68,42 @@ public class SteeringEntity : MonoBehaviour
     }
     void Update()
     {
-        IsOnView = targetRb && lineOfSight.CheckDistance(target) && lineOfSight.CheckAngle(target) && lineOfSight.CheckView(target);
+        IsOnView = targetRb && lineOfSight.CheckDistance(Target) && lineOfSight.CheckAngle(Target) && lineOfSight.CheckView(Target);
 
-
-        if (obstacleAvoid.IsObstacle == false && IsOnView)
+        if (IsOnView)
         {
-            steeringVelocity = currentSteering.MoveDirection();
-            //steeringVelocity += obstacleAv.Avoid() * steeringVelocity.magnitude;
-            rb.AddForce(steeringVelocity, ForceMode.Acceleration);
-
-            if (rb.velocity != Vector3.zero)
+            enemyPatrol.IsPause = true;
+            if (obstacleAvoid.IsObstacle == false)
             {
-                transform.forward = rb.velocity;
+                steeringVelocity = currentSteering.MoveDirection();
+                //steeringVelocity += obstacleAv.Avoid() * steeringVelocity.magnitude;
+                rb.AddForce(steeringVelocity, ForceMode.Acceleration);
+
+                if (rb.velocity != Vector3.zero)
+                {
+                    transform.forward = rb.velocity;
+                }
+            }
+            else if (obstacleAvoid.IsObstacle == true)
+            {
+                rb.velocity = steeringVelocity.normalized * maxVelocity;
+
+                if (steeringVelocity != Vector3.zero)
+                    transform.forward = steeringVelocity.normalized;
             }
         }
-        else if (obstacleAvoid.IsObstacle == true && IsOnView)
+        else
         {
-            rb.velocity = steeringVelocity.normalized * maxVelocity;
-
-            if (steeringVelocity != Vector3.zero)
-                transform.forward = steeringVelocity.normalized;
-            //transform.forward = rb.velocity;
+            enemyPatrol.IsPause = false;
+            enemyPatrol.Patrol();
         }
+    }
+
+    private IEnumerator StaySearching()
+    {
+        enemyPatrol.IsPause = true;
+        yield return new WaitForSeconds(3f);
+        enemyPatrol.IsPause = false;
     }
 
     //private void OnDrawGizmos()

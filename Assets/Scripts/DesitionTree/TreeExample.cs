@@ -32,12 +32,12 @@ public class TreeExample : MonoBehaviour
 
     private void CreateTree()
     {
-        ActionNode huir = new ActionNode(Huir);
-        ActionNode dormir = new ActionNode(Dormir);
-        ActionNode viciar = new ActionNode(Viciar);
-        ActionNode talar = new ActionNode(Talar);
-        ActionNode minar = new ActionNode(Minar);
-        ActionNode contruir = new ActionNode(Construir);
+        ActionNodeClass huir = new ActionNodeClass(Huir);
+        ActionNodeClass dormir = new ActionNodeClass(Dormir);
+        ActionNodeClass viciar = new ActionNodeClass(Viciar);
+        ActionNodeClass talar = new ActionNodeClass(Talar);
+        ActionNodeClass minar = new ActionNodeClass(Minar);
+        ActionNodeClass contruir = new ActionNodeClass(Construir);
 
         QuestionNode enoughStone = new QuestionNode(contruir, minar, () => stoneAmount >= 10);
         QuestionNode enoughWood = new QuestionNode(enoughStone, talar, HaveEnoghWood);
