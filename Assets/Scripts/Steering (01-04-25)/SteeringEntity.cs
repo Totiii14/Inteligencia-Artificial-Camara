@@ -1,29 +1,28 @@
 using System.Collections;
 using UnityEngine;
-using static UnityEditor.PlayerSettings;
 
 public class SteeringEntity : MonoBehaviour
 {
-    [SerializeField] Transform Target;
+    [field: SerializeField] public Transform Target { get; private set; }
     [SerializeField] Rigidbody targetRb;
     [SerializeField] float maxVelocity;
     [SerializeField] float timePrediction;
 
-
-    public bool IsOnView;
-
     public SteeringMode mode;
     private ISteering currentSteering;
-
     Vector3 steeringVelocity;
-
-    public Vector3 SteeringVelocity { get => steeringVelocity; set => steeringVelocity = value; }
-
 
     Rigidbody rb;
     ObstacleAvoid obstacleAvoid;
     LineOfSight lineOfSight;
-    EnemyPatrol enemyPatrol;
+    public EnemyPatrol enemyPatrol { get; private set; }
+    EnemyManager enemyManager;
+
+    private bool IsChasing = false;
+    public bool IsOnView;
+    public Vector3 SteeringVelocity { get => steeringVelocity; set => steeringVelocity = value; }
+
+    private Coroutine backToPatrolCoroutine;
 
     //ExampleTeacher obstacleAv;
 
@@ -41,23 +40,16 @@ public class SteeringEntity : MonoBehaviour
         rb = GetComponent<Rigidbody>();
         lineOfSight = GetComponent<LineOfSight>();
         enemyPatrol = GetComponentInParent<EnemyPatrol>();
+        enemyManager = GetComponent<EnemyManager>();
     }
 
     void Start()
     {
         //obstacleAv = GetComponent<ExampleTeacher>();
-        Flee flee = new(rb, targetRb.transform, maxVelocity);
-        Seek seek = new(rb, targetRb.transform, maxVelocity);
         Persuit persuit = new(rb, targetRb, maxVelocity, timePrediction);
         Evade evade = new(rb, targetRb, maxVelocity, timePrediction);
         switch (mode)
         {
-            case SteeringMode.seek:
-                currentSteering = seek;
-                break;
-            case SteeringMode.flee:
-                currentSteering = flee;
-                break;
             case SteeringMode.persuit:
                 currentSteering = persuit;
                 break;
@@ -66,14 +58,34 @@ public class SteeringEntity : MonoBehaviour
                 break;
         }
     }
+
     void Update()
     {
         IsOnView = targetRb && lineOfSight.CheckDistance(Target) && lineOfSight.CheckAngle(Target) && lineOfSight.CheckView(Target);
 
-        if (IsOnView)
+        if (IsOnView || (currentSteering is Persuit p && p.IsOverridingTarget))
         {
+            if (backToPatrolCoroutine != null)
+            {
+                StopCoroutine(backToPatrolCoroutine);
+                backToPatrolCoroutine = null;
+            }
+
+            IsChasing = true;
             enemyPatrol.IsPause = true;
-            enemyPatrol.IsPatrolPause = false; 
+            enemyPatrol.IsPatrolPause = false;
+            enemyManager.EnemyAlarm();
+
+            if (currentSteering is Persuit persuitSteering && persuitSteering.IsOverridingTarget)
+            {
+                if (Vector3.Distance(transform.position, persuitSteering.TargetPosition) < 1.5f)
+                {
+                    persuitSteering.ResetTarget();
+                    if (backToPatrolCoroutine == null)
+                        backToPatrolCoroutine = StartCoroutine(BackToPatrol());
+                }
+            }
+
             if (obstacleAvoid.IsObstacle == false)
             {
                 steeringVelocity = currentSteering.MoveDirection();
@@ -95,9 +107,45 @@ public class SteeringEntity : MonoBehaviour
         }
         else
         {
+            IsChasing = false;
+            if (enemyPatrol.IsPause)
+            {
+                if (backToPatrolCoroutine == null)
+                    backToPatrolCoroutine = StartCoroutine(BackToPatrol());
+            }
+            else
+            {
+                enemyPatrol.IsPause = false;
+                enemyPatrol.IsPatrolPause = false;
+                enemyPatrol.Patrol();
+            }
+        }
+    }
+
+    private IEnumerator BackToPatrol()
+    {
+        rb.velocity = Vector3.zero;
+        rb.angularVelocity = Vector3.zero;
+        yield return new WaitForSeconds(3f);
+
+        if (!IsChasing) // recién chequeás después de esperar
+        {
             enemyPatrol.IsPause = false;
-            enemyPatrol.IsPatrolPause = false; 
+            enemyPatrol.IsPatrolPause = false;
             enemyPatrol.Patrol();
+        }
+
+        backToPatrolCoroutine = null; // importante limpiar la variable
+    }
+
+    public void GoToLastSeenPosition(Vector3 lastPosition)
+    {
+        if (mode == SteeringMode.persuit)
+        {
+            if (currentSteering is Persuit persuitSteering)
+            {
+                persuitSteering.OverrideTarget(lastPosition);
+            }
         }
     }
 

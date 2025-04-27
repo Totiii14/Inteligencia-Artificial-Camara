@@ -14,6 +14,7 @@ public class Evade : ISteering
         this.maxVelocity = maxVelocity;
         this.timePrediction = timePrediction;
     }
+
     public Vector3 MoveDirection()
     {
         Vector3 futurePosition = targetRB.position + targetRB.velocity * timePrediction * Vector3.Distance(targetRB.position, rb.position);

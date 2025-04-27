@@ -61,7 +61,7 @@ public class EnemyPatrol : MonoBehaviour
         {
             IsPause = true;
             IsPatrolPause = true;
-            rbEnemy.velocity = Vector3.zero; // <- me aseguro de frenarlo justo al llegar
+            rbEnemy.velocity = Vector3.zero; 
             yield return new WaitForSeconds(pauseTime);
             IsPause = false;
             isPatrollingForward = false;
@@ -70,7 +70,7 @@ public class EnemyPatrol : MonoBehaviour
         {
             IsPause = true;
             IsPatrolPause = true;
-            rbEnemy.velocity = Vector3.zero; // <- me aseguro de frenarlo justo al llegar
+            rbEnemy.velocity = Vector3.zero; 
             yield return new WaitForSeconds(pauseTime);
             IsPause = false;
             isPatrollingForward = true;
