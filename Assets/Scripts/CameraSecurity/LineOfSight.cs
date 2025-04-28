@@ -16,12 +16,18 @@ public class LineOfSight : MonoBehaviour
 
     public bool CheckDistance(Transform target)
     {
+        if (target.GetComponent<PlayerDetection>()?.IsDetectable == false)
+            return false;
+
         float distance = Vector3.Distance(target.position, securityCamera.position);
         return distance <= detectionRange;
     }
 
     public bool CheckAngle(Transform target)
     {
+        if (target.GetComponent<PlayerDetection>()?.IsDetectable == false)
+            return false;
+
         Vector3 direction = target.position - securityCamera.position;
         Vector3 adjustedForward = Quaternion.Euler(verticalAngleOffset, 0f, 0f) * securityCamera.forward;
 
@@ -31,6 +37,9 @@ public class LineOfSight : MonoBehaviour
 
     public bool CheckView(Transform target)
     {
+        if (target.GetComponent<PlayerDetection>()?.IsDetectable == false)
+            return false;
+
         Vector3 direction = target.position - securityCamera.position;
         return !Physics.Raycast(securityCamera.position, direction.normalized, direction.magnitude, obstaclesMask);
     }

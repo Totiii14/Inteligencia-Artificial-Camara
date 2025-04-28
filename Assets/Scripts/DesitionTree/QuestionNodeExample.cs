@@ -3,13 +3,13 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class QuestionNode : IDesitionNode
+public class QuestionNodeExample : IDesitionNodeExample
 {
-    IDesitionNode trueNode;
-    IDesitionNode falseNode;
+    IDesitionNodeExample trueNode;
+    IDesitionNodeExample falseNode;
     private Func<bool> question;
 
-    public QuestionNode(IDesitionNode trueNode, IDesitionNode falseNode, Func<bool> question)
+    public QuestionNodeExample(IDesitionNodeExample trueNode, IDesitionNodeExample falseNode, Func<bool> question)
     {
         this.trueNode = trueNode;
         this.falseNode = falseNode;

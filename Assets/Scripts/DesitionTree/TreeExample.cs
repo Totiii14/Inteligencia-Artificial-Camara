@@ -16,7 +16,7 @@ public class TreeExample : MonoBehaviour
     [SerializeField] bool sleepy;
     [SerializeField] int woodAmount;
     [SerializeField] int stoneAmount;
-    private IDesitionNode rootNode;
+    private IDesitionNodeExample rootNode;
 
     void Start()
     {
@@ -39,12 +39,12 @@ public class TreeExample : MonoBehaviour
         ActionNodeClass minar = new ActionNodeClass(Minar);
         ActionNodeClass contruir = new ActionNodeClass(Construir);
 
-        QuestionNode enoughStone = new QuestionNode(contruir, minar, () => stoneAmount >= 10);
-        QuestionNode enoughWood = new QuestionNode(enoughStone, talar, HaveEnoghWood);
-        QuestionNode amISleepy = new QuestionNode(dormir, viciar, () => sleepy);
-        QuestionNode isRaining = new QuestionNode(amISleepy, enoughWood, () => raining);
-        QuestionNode isDayTime = new QuestionNode(isRaining, dormir, () => time == DayTime.Day);
-        QuestionNode enemiesNearby = new QuestionNode(huir, isDayTime, IsEnemyNearby);
+        QuestionNodeExample enoughStone = new QuestionNodeExample(contruir, minar, () => stoneAmount >= 10);
+        QuestionNodeExample enoughWood = new QuestionNodeExample(enoughStone, talar, HaveEnoghWood);
+        QuestionNodeExample amISleepy = new QuestionNodeExample(dormir, viciar, () => sleepy);
+        QuestionNodeExample isRaining = new QuestionNodeExample(amISleepy, enoughWood, () => raining);
+        QuestionNodeExample isDayTime = new QuestionNodeExample(isRaining, dormir, () => time == DayTime.Day);
+        QuestionNodeExample enemiesNearby = new QuestionNodeExample(huir, isDayTime, IsEnemyNearby);
 
         rootNode = enemiesNearby;
     }

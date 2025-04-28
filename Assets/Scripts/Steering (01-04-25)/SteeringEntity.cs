@@ -86,23 +86,24 @@ public class SteeringEntity : MonoBehaviour
                 }
             }
 
-            if (obstacleAvoid.IsObstacle == false)
-            {
-                steeringVelocity = currentSteering.MoveDirection();
-                //steeringVelocity += obstacleAv.Avoid() * steeringVelocity.magnitude;
-                rb.AddForce(steeringVelocity, ForceMode.Acceleration);
+            Vector3 avoidanceForce = obstacleAvoid.GetAvoidanceForce();
 
-                if (rb.velocity != Vector3.zero)
-                {
-                    transform.forward = rb.velocity;
-                }
+            Vector3 finalVelocity;
+
+            if (avoidanceForce != Vector3.zero)
+            {
+                finalVelocity = avoidanceForce.normalized * maxVelocity;
             }
-            else if (obstacleAvoid.IsObstacle == true)
+            else
             {
-                rb.velocity = steeringVelocity.normalized * maxVelocity;
+                finalVelocity = currentSteering.MoveDirection();
+            }
 
-                if (steeringVelocity != Vector3.zero)
-                    transform.forward = steeringVelocity.normalized;
+            rb.AddForce(finalVelocity, ForceMode.Acceleration);
+
+            if (rb.velocity != Vector3.zero)
+            {
+                transform.forward = rb.velocity.normalized;
             }
         }
         else

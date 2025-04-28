@@ -3,79 +3,34 @@ using UnityEngine;
 
 public class ObstacleAvoid : MonoBehaviour
 {
-    [SerializeField] LayerMask obstacle;
-    [SerializeField] float distance;
+    [SerializeField] private LayerMask obstacleLayer;
+    [SerializeField] private float avoidForce = 10f;
+    [SerializeField] private float detectDistance = 5f;
+    [SerializeField] private float sphereRadius = 0.5f;
 
-    [SerializeField] bool isObstacle;
+    private Rigidbody rb;
 
-    Collider[] colliders;
-
-    public bool IsObstacle { get => isObstacle; set => isObstacle = value; }
-
-    void Update()
+    private void Awake()
     {
-        colliders = Physics.OverlapSphere(transform.position, 3, obstacle);
-        ObstacleAvoids();
+        rb = GetComponent<Rigidbody>();
     }
 
-    private void ObstacleAvoids()
+    public Vector3 GetAvoidanceForce()
     {
-        foreach (Collider collider in colliders)
-        {
-            ReturnDistance(collider);
-        }
-    }
+        RaycastHit hit;
+        Vector3 avoidance = Vector3.zero;
 
-    private void ReturnDistance(Collider collider)
-    {
-        Vector3 closestPoint = collider.ClosestPoint(transform.position);
-        distance = Vector3.Distance(transform.position, closestPoint);
+        if (Physics.SphereCast(transform.position, sphereRadius, transform.forward, out hit, detectDistance, obstacleLayer))
+        {
+            Vector3 obstacleNormal = hit.normal;
+            obstacleNormal.y = 0; // No queremos movimiento vertical
 
-        if(distance < 1f)
-        {
-            isObstacle = true;
-            SteeringEntity collEntity = GetComponent<SteeringEntity>();
-            collEntity.SteeringVelocity = NewDirection();
-        }
-        else
-            isObstacle = false;
-    }
+            // Calculamos un desvío lateral
+            Vector3 lateralDirection = Vector3.Cross(obstacleNormal, Vector3.up).normalized;
 
-    private Vector3 NewDirection()
-    {
-        Ray fwd = new(transform.position, transform.forward);
-        Ray right = new(transform.position, transform.right);
-        Ray left = new(transform.position, -transform.right);
-        Ray back = new(transform.position, -transform.forward);
+            avoidance = lateralDirection * avoidForce;
+        }
 
-        bool rayForward = Physics.Raycast(fwd, 7f, obstacle);
-        bool rayBack = Physics.Raycast(back, 7f, obstacle);
-        bool rayRight = Physics.Raycast(right, 7f, obstacle);
-        bool rayLeft = Physics.Raycast(left, 7f, obstacle);
-
-        if (!rayForward)
-        {
-            Debug.Log("adelante");
-            return fwd.direction;
-        }
-        else if (!rayRight)
-        {
-            Debug.Log("rights");
-            return right.direction;
-        }
-        else if (!rayLeft)
-        {
-            Debug.Log("left");
-            return left.direction;
-        }
-        else if (!rayBack)
-        {
-            Debug.Log("back");
-            return back.direction;
-        }
-        else
-        {
-            return Vector3.zero;
-        }
+        return avoidance;
     }
 }
