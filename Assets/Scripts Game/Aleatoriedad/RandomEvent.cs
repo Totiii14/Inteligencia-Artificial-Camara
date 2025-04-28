@@ -25,8 +25,6 @@ public class RandomEvent : MonoBehaviour
             {
                 StartCoroutine(BecomeInvisibleTemporarily());
             }
-
-            Destroy(gameObject);
         }
     }
 
@@ -41,7 +39,7 @@ public class RandomEvent : MonoBehaviour
             playerDetection.SetDetectable(false);
 
         yield return new WaitForSeconds(invisibilityDuration);
-
+        Destroy(gameObject);
         playerDetection.SetDetectable(true);
     }
 }
