@@ -2,16 +2,16 @@ using UnityEngine;
 
 public class LineOfSight : MonoBehaviour
 {
-    [SerializeField] private Transform securityCamera;
-    [SerializeField] private float detectionRange;
-    [SerializeField] private float detectionAngle;
-    [SerializeField] private LayerMask obstaclesMask;
-    [SerializeField] private float verticalAngleOffset = 0f;
+    [field: SerializeField] public Transform SecurityCamera {get; private set;}
+    [field: SerializeField] public float DetectionRange {get; private set;}
+    [field: SerializeField] public float DetectionAngle {get; private set;}
+    [field: SerializeField] public LayerMask ObstaclesMask {get; private set;}
+    [field: SerializeField] public float VerticalAngleOffset { get; private set; } = 0f;
 
     private void Awake()
     {
-        if (securityCamera == null)
-            securityCamera = transform;
+        if (SecurityCamera == null)
+            SecurityCamera = transform;
     }
 
     public bool CheckDistance(Transform target)
@@ -19,8 +19,8 @@ public class LineOfSight : MonoBehaviour
         if (target.GetComponent<PlayerDetection>()?.IsDetectable == false)
             return false;
 
-        float distance = Vector3.Distance(target.position, securityCamera.position);
-        return distance <= detectionRange;
+        float distance = Vector3.Distance(target.position, SecurityCamera.position);
+        return distance <= DetectionRange;
     }
 
     public bool CheckAngle(Transform target)
@@ -28,11 +28,11 @@ public class LineOfSight : MonoBehaviour
         if (target.GetComponent<PlayerDetection>()?.IsDetectable == false)
             return false;
 
-        Vector3 direction = target.position - securityCamera.position;
-        Vector3 adjustedForward = Quaternion.Euler(verticalAngleOffset, 0f, 0f) * securityCamera.forward;
+        Vector3 direction = target.position - SecurityCamera.position;
+        Vector3 adjustedForward = Quaternion.Euler(VerticalAngleOffset, 0f, 0f) * SecurityCamera.forward;
 
         float angle = Vector3.Angle(adjustedForward, direction);
-        return angle <= detectionAngle / 2f;
+        return angle <= DetectionAngle / 2f;
     }
 
     public bool CheckView(Transform target)
@@ -40,21 +40,21 @@ public class LineOfSight : MonoBehaviour
         if (target.GetComponent<PlayerDetection>()?.IsDetectable == false)
             return false;
 
-        Vector3 direction = target.position - securityCamera.position;
-        return !Physics.Raycast(securityCamera.position, direction.normalized, direction.magnitude, obstaclesMask);
+        Vector3 direction = target.position - SecurityCamera.position;
+        return !Physics.Raycast(SecurityCamera.position, direction.normalized, direction.magnitude, ObstaclesMask);
     }
 
     private void OnDrawGizmos()
     {
-        if (securityCamera == null) return;
+        if (SecurityCamera == null) return;
 
-        Vector3 adjustedForward = Quaternion.Euler(verticalAngleOffset, 0f, 0f) * securityCamera.forward;
+        Vector3 adjustedForward = Quaternion.Euler(VerticalAngleOffset, 0f, 0f) * SecurityCamera.forward;
 
         Gizmos.color = Color.cyan;
-        Gizmos.DrawWireSphere(securityCamera.position, detectionRange);
+        Gizmos.DrawWireSphere(SecurityCamera.position, DetectionRange);
 
         Gizmos.color = Color.red;
-        Gizmos.DrawRay(securityCamera.position, Quaternion.Euler(0, detectionAngle / 2f, 0) * adjustedForward * detectionRange);
-        Gizmos.DrawRay(securityCamera.position, Quaternion.Euler(0, -detectionAngle / 2f, 0) * adjustedForward * detectionRange);
+        Gizmos.DrawRay(SecurityCamera.position, Quaternion.Euler(0, DetectionAngle / 2f, 0) * adjustedForward * DetectionRange);
+        Gizmos.DrawRay(SecurityCamera.position, Quaternion.Euler(0, -DetectionAngle / 2f, 0) * adjustedForward * DetectionRange);
     }
 }

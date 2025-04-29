@@ -18,17 +18,17 @@ public class PlayerModel
     {
         Vector3 moveDir = Data.orientation.forward * dir.z + Data.orientation.right * dir.x;
         if (IsGrounded())
-            rb.AddForce(moveDir.normalized * speed * 10f, ForceMode.Force);
+            rb.AddForce(moveDir.normalized * speed * 10f * Time.deltaTime, ForceMode.Force);
         else
-            rb.AddForce(moveDir.normalized * speed * 10f * Data.airMultiplier, ForceMode.Force);
+            rb.AddForce(moveDir.normalized * speed * 10f * Data.airMultiplier * Time.deltaTime, ForceMode.Force);
     }
 
     public void Jump()
     {
         if (IsGrounded())
         {
-            rb.velocity = new Vector3(rb.velocity.x, 0f, rb.velocity.z);
-            rb.AddForce(Vector3.up * Data.jumpForce, ForceMode.Impulse);
+            rb.velocity = new Vector3(rb.velocity.x, 0f, rb.velocity.z) * Time.deltaTime;
+            rb.AddForce(Vector3.up * Data.jumpForce * Time.deltaTime, ForceMode.Impulse);
         }
     }
 
