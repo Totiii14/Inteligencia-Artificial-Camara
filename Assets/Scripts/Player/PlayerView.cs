@@ -5,12 +5,12 @@ public class PlayerView : MonoBehaviour
     [SerializeField]
     Animator _anim;
     Rigidbody _rb;
-    PlayerModel _model;
+    PlayerModelExample _model;
 
     private void Awake()
     {
         _rb = GetComponent<Rigidbody>();
-        _model = GetComponent<PlayerModel>();
+        _model = GetComponent<PlayerModelExample>();
         _model.OnSpin += OnSpinAnimation;
     }
 

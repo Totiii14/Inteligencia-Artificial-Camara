@@ -3,13 +3,13 @@ using UnityEngine;
 public class CameraController : MonoBehaviour
 {
     public Transform target;
-    private PlayerModel playerModel;
+    private PlayerModelExample playerModel;
     private CameraModel model;
     private LineOfSight los;
 
     private void Awake()
     {
-        playerModel = target.GetComponent<PlayerModel>();
+        playerModel = target.GetComponent<PlayerModelExample>();
         model = GetComponent<CameraModel>();
         los = GetComponent<LineOfSight>();
     }

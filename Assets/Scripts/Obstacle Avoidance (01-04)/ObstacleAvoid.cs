@@ -23,9 +23,8 @@ public class ObstacleAvoid : MonoBehaviour
         if (Physics.SphereCast(transform.position, sphereRadius, transform.forward, out hit, detectDistance, obstacleLayer))
         {
             Vector3 obstacleNormal = hit.normal;
-            obstacleNormal.y = 0; // No queremos movimiento vertical
+            obstacleNormal.y = 0; 
 
-            // Calculamos un desvío lateral
             Vector3 lateralDirection = Vector3.Cross(obstacleNormal, Vector3.up).normalized;
 
             avoidance = lateralDirection * avoidForce;

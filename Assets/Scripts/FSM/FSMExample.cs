@@ -1,14 +1,14 @@
 using System;
 
-public class FSM
+public class FSMExample
 {
-    private State _currentState;
+    private StateExample _currentState;
     //si queremos que pase algo durante la transición
     //Action<PlayerStates, State, State> onTransition = delegate { };
 
-    public FSM() { }
+    public FSMExample() { }
 
-    public void SetInit(State init)
+    public void SetInit(StateExample init)
     {
         _currentState = init;
         _currentState.Awake();
@@ -19,9 +19,9 @@ public class FSM
         _currentState.Execute();
     }
     
-    public void Transition(PlayerStates input)
+    public void Transition(PlayerStatesExample input)
     {
-        State newState = _currentState.GetTransition(input);
+        StateExample newState = _currentState.GetTransition(input);
         if (newState == null) return;
         _currentState.Sleep();
         // onTransition(input, _currentState, newState);

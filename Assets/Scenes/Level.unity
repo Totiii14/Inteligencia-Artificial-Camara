@@ -5967,7 +5967,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: dd96e8800fe796240ac2d036e7e7c400, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  invisibilityDuration: 1
+  invisibilityDuration: 4
   enemyManager: {fileID: 345237063}
   playerDetection: {fileID: 773869277}
 --- !u!135 &569044933
@@ -8333,15 +8333,15 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4774185377657666, guid: f30cc804e5a71554eb49d31b985b1d81, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 237.44336
+      value: 237.4
       objectReference: {fileID: 0}
     - target: {fileID: 4774185377657666, guid: f30cc804e5a71554eb49d31b985b1d81, type: 3}
       propertyPath: m_LocalPosition.y
-      value: -116.92641
+      value: -116.9
       objectReference: {fileID: 0}
     - target: {fileID: 4774185377657666, guid: f30cc804e5a71554eb49d31b985b1d81, type: 3}
       propertyPath: m_LocalPosition.z
-      value: -94.22281
+      value: -94.2
       objectReference: {fileID: 0}
     - target: {fileID: 4774185377657666, guid: f30cc804e5a71554eb49d31b985b1d81, type: 3}
       propertyPath: m_LocalRotation.w
@@ -10055,8 +10055,8 @@ GameObject:
   m_Component:
   - component: {fileID: 773869276}
   - component: {fileID: 773869275}
-  - component: {fileID: 773869274}
   - component: {fileID: 773869277}
+  - component: {fileID: 773869278}
   m_Layer: 0
   m_Name: Player
   m_TagString: Player
@@ -10064,35 +10064,6 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &773869274
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 773869273}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 19c6b8da9ec63894bb6533594a5c3529, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  walkSpeed: 7
-  sprintSpeed: 10
-  groundDrag: 5
-  jumpForce: 6
-  jumpCooldown: 0.25
-  airMultiplier: 0.4
-  crouchSpeed: 3.5
-  crouchYScale: 0.5
-  jumpKey: 32
-  sprintKey: 304
-  crouchKey: 306
-  playerHeight: 2
-  whatIsGround:
-    serializedVersion: 2
-    m_Bits: 64
-  orientation: {fileID: 621314637}
-  state: 0
 --- !u!54 &773869275
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -10151,6 +10122,29 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   <IsDetectable>k__BackingField: 1
+--- !u!114 &773869278
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 773869273}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6327f15a031757d4bafda4a11bb3ceaa, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  walkSpeed: 4
+  sprintSpeed: 6
+  crouchSpeed: 2
+  jumpForce: 7
+  groundDrag: 5
+  airMultiplier: 0.2
+  playerHeight: 2
+  groundLayer:
+    serializedVersion: 2
+    m_Bits: 64
+  orientation: {fileID: 621314637}
 --- !u!1 &775886692
 GameObject:
   m_ObjectHideFlags: 0

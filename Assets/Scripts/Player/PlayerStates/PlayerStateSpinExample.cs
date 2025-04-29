@@ -1,10 +1,10 @@
 using UnityEngine;
 
-public class PlayerStateSpin : State
+public class PlayerStateSpinExample : StateExample
 {
-    private PlayerModel _model;
+    private PlayerModelExample _model;
 
-    public PlayerStateSpin(FSM fsm, PlayerModel model)
+    public PlayerStateSpinExample(FSMExample fsm, PlayerModelExample model)
     {
         this._fsm = fsm;
         this._model = model;
@@ -21,7 +21,7 @@ public class PlayerStateSpin : State
         base.Execute();
 
         if (Input.GetKeyDown(KeyCode.Space))
-            _fsm.Transition(PlayerStates.IdleState);
+            _fsm.Transition(PlayerStatesExample.IdleState);
     }
 
     public override void Sleep()

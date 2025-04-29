@@ -1,10 +1,10 @@
 using UnityEngine;
 
-public class PlayerStateIdle : State
+public class PlayerStateIdleExample : StateExample
 {
-    private PlayerModel _model;
+    private PlayerModelExample _model;
 
-    public PlayerStateIdle(FSM fsm, PlayerModel model)
+    public PlayerStateIdleExample(FSMExample fsm, PlayerModelExample model)
     {
         _fsm = fsm;
         _model = model;
@@ -21,9 +21,9 @@ public class PlayerStateIdle : State
         float h = Input.GetAxis("Horizontal");
         float v = Input.GetAxis("Vertical");
         if (h != 0 || v != 0)
-            _fsm.Transition(PlayerStates.MoveState);
+            _fsm.Transition(PlayerStatesExample.MoveState);
 
         if (Input.GetKeyDown(KeyCode.Space))
-            _fsm.Transition(PlayerStates.SpinState);
+            _fsm.Transition(PlayerStatesExample.SpinState);
     }
 }

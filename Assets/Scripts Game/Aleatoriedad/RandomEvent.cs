@@ -6,14 +6,11 @@ public class RandomEvent : MonoBehaviour
     [SerializeField] private float invisibilityDuration = 4f;
     [SerializeField] private EnemyManager enemyManager;
     [SerializeField] private PlayerDetection playerDetection;
-    private bool hasActivated = false;
 
     private void OnCollisionEnter(Collision other)
     {
         if (other.gameObject.CompareTag("Player"))
         {
-            hasActivated = true;
-
             float randomValue = Random.value;
             Debug.Log($"Random Value: {randomValue}");
 
@@ -26,6 +23,7 @@ public class RandomEvent : MonoBehaviour
                 StartCoroutine(BecomeInvisibleTemporarily());
             }
         }
+        GetComponent<Collider>().enabled = false;
     }
 
     private void NotifyEnemies(Vector3 playerPosition)
@@ -38,8 +36,12 @@ public class RandomEvent : MonoBehaviour
         if (playerDetection != null)
             playerDetection.SetDetectable(false);
 
+        Debug.Log("Se vino");
+
         yield return new WaitForSeconds(invisibilityDuration);
+
         Destroy(gameObject);
+        Debug.Log("Se gue");
         playerDetection.SetDetectable(true);
     }
 }

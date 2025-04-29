@@ -1,10 +1,10 @@
 using UnityEngine;
 
-public class PlayerStateMove : State
+public class PlayerStateMoveExample : StateExample
 {
-    private PlayerModel _model;
+    private PlayerModelExample _model;
 
-    public PlayerStateMove(FSM fsm, PlayerModel model)
+    public PlayerStateMoveExample(FSMExample fsm, PlayerModelExample model)
     {
         this._fsm = fsm;
         this._model = model;
@@ -22,9 +22,9 @@ public class PlayerStateMove : State
 
         if (h != 0 || v != 0) _model.Look(dir);
         else
-            _fsm.Transition(PlayerStates.IdleState);
+            _fsm.Transition(PlayerStatesExample.IdleState);
 
         if (Input.GetKeyDown(KeyCode.Space))
-            _fsm.Transition(PlayerStates.SpinState);
+            _fsm.Transition(PlayerStatesExample.SpinState);
     }
 }

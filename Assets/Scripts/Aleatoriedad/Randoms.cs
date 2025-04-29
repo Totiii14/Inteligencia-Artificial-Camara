@@ -79,11 +79,11 @@ public static class Randoms
 
         return matrix[rndX, rndY];
 
-        int lengthX = matrix.GetLength(0);
-        int rnd = (int)Random.value * matrix.Length;
-        int x = rnd % lengthX;
+        //int lengthX = matrix.GetLength(0);
+        //int rnd = (int)Random.value * matrix.Length;
+        //int x = rnd % lengthX;
 
-        return matrix[x, (rnd - x) / lengthX];
+        //return matrix[x, (rnd - x) / lengthX];
     }
 
     public static Vector3 NoY(this Vector3 v3)

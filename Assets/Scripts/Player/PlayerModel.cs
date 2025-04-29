@@ -1,7 +1,7 @@
 using System;
 using UnityEngine;
 
-public class PlayerModel : MonoBehaviour
+public class PlayerModelExample : MonoBehaviour
 {
     Rigidbody _rb;
     public float speed;

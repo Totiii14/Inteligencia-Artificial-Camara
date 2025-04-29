@@ -4,15 +4,15 @@ using UnityEngine;
 
 public class PlayerController : MonoBehaviour
 {
-    private FSM fsm;
-    PlayerModel model;
+    private FSMExample fsm;
+    PlayerModelExample model;
     PlayerView view;
 
     //private PlayerStates currentState;
 
     private void Start()
     {
-        model = GetComponent<PlayerModel>();
+        model = GetComponent<PlayerModelExample>();
         view = GetComponent<PlayerView>();
         //currentState = PlayerStates.IdleState;
         SetFSM();
@@ -20,19 +20,19 @@ public class PlayerController : MonoBehaviour
 
     private void SetFSM()
     {
-        fsm = new FSM();
+        fsm = new FSMExample();
 
-        PlayerStateIdle idle = new PlayerStateIdle(fsm, model);
-        PlayerStateMove move = new PlayerStateMove(fsm, model);
-        PlayerStateSpin spin = new PlayerStateSpin(fsm, model);
+        PlayerStateIdleExample idle = new PlayerStateIdleExample(fsm, model);
+        PlayerStateMoveExample move = new PlayerStateMoveExample(fsm, model);
+        PlayerStateSpinExample spin = new PlayerStateSpinExample(fsm, model);
 
-        idle.AddTransition(PlayerStates.MoveState, move);
-        idle.AddTransition(PlayerStates.SpinState, spin);
+        idle.AddTransition(PlayerStatesExample.MoveState, move);
+        idle.AddTransition(PlayerStatesExample.SpinState, spin);
 
-        move.AddTransition(PlayerStates.IdleState, idle);
-        move.AddTransition(PlayerStates.SpinState, spin);
+        move.AddTransition(PlayerStatesExample.IdleState, idle);
+        move.AddTransition(PlayerStatesExample.SpinState, spin);
 
-        spin.AddTransition(PlayerStates.IdleState, idle);
+        spin.AddTransition(PlayerStatesExample.IdleState, idle);
 
         
 
@@ -45,7 +45,7 @@ public class PlayerController : MonoBehaviour
     }
 }
 
-public enum PlayerStates
+public enum PlayerStatesExample
 {
     IdleState,
     MoveState,

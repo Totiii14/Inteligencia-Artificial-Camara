@@ -1,0 +1,50 @@
+using UnityEngine;
+
+public class PlayerModel 
+{
+    public PlayerFSM Data { get; private set; }
+    private Rigidbody rb;
+    private float startYScale;
+    private bool isGrounded;
+
+    public PlayerModel(PlayerFSM data, Rigidbody rb)
+    {
+        this.Data = data;
+        this.rb = rb;
+        startYScale = data.transform.localScale.y;
+    }
+
+    public void Move(Vector3 dir, float speed)
+    {
+        Vector3 moveDir = Data.orientation.forward * dir.z + Data.orientation.right * dir.x;
+        if (IsGrounded())
+            rb.AddForce(moveDir.normalized * speed * 10f, ForceMode.Force);
+        else
+            rb.AddForce(moveDir.normalized * speed * 10f * Data.airMultiplier, ForceMode.Force);
+    }
+
+    public void Jump()
+    {
+        if (IsGrounded())
+        {
+            rb.velocity = new Vector3(rb.velocity.x, 0f, rb.velocity.z);
+            rb.AddForce(Vector3.up * Data.jumpForce, ForceMode.Impulse);
+        }
+    }
+
+    public bool IsGrounded()
+    {
+        float checkDistance = (Data.transform.localScale.y / startYScale) * (Data.playerHeight * 0.5f + 0.2f);
+        return Physics.Raycast(Data.transform.position, Vector3.down, checkDistance, Data.groundLayer);
+    }
+
+    public void ApplyDrag()
+    {
+        rb.drag = IsGrounded() ? Data.groundDrag : 0f;
+    }
+
+    public Vector2 GetInput()
+    {
+        return new Vector2(Input.GetAxisRaw("Horizontal"), Input.GetAxisRaw("Vertical"));
+    }
+}

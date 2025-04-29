@@ -119,7 +119,7 @@ public class PlayerMovement : MonoBehaviour
         }
     }
 
-    // determina el estado actual
+    //determina el estado actual
     private void StateHandler()
     {
         if (Input.GetKey(crouchKey))

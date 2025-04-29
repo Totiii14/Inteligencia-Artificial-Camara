@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using static PlayerStatesEnum;
 
 public class State 
 {
