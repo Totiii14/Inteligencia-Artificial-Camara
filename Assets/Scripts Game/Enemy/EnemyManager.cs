@@ -1,12 +1,14 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using UnityEngine.UI;
 using static SteeringEntity;
 
 public class EnemyManager : MonoBehaviour
 {
     SteeringEntity steering;
 
+    [SerializeField] Image defeatScreen;
     public List<SteeringEntity> persuitEnemies = new List<SteeringEntity>();
     public Vector3? lastKnownPlayerPosition = null;
 
@@ -47,5 +49,8 @@ public class EnemyManager : MonoBehaviour
     {
         Debug.Log("Juego end");
         Time.timeScale = 0f;
+        defeatScreen.gameObject.SetActive(true);
+        Cursor.lockState = CursorLockMode.None;
+        Cursor.visible = true;
     }
 }

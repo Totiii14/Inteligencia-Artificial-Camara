@@ -9,6 +9,8 @@ public class EnemyPatrol : MonoBehaviour
     [SerializeField] private int maxVelocity;
     [SerializeField] private float distancePoint = 1f;
     [SerializeField] private float pauseTime = 2f;
+    private SteeringEntity steering;
+    private ObstacleAvoid obstacleAvoid;
 
 
     private Rigidbody rbEnemy;
@@ -20,6 +22,8 @@ public class EnemyPatrol : MonoBehaviour
     private void Awake()
     {
         rbEnemy = enemy.GetComponent<Rigidbody>();
+        steering = enemy.GetComponent<SteeringEntity>();
+        obstacleAvoid = enemy.GetComponent<ObstacleAvoid>();
     }
 
     public void Patrol()
@@ -29,29 +33,52 @@ public class EnemyPatrol : MonoBehaviour
         if (!IsPause)
         {
             Transform currentTarget = patrolPath[currentPatrolIndex].transform;
+            Vector3 toTarget = (currentTarget.position - enemy.transform.position);
+            toTarget.y = 0;
 
-            Vector3 direction = (currentTarget.position - enemy.transform.position).normalized * maxVelocity;
-            direction.y = 0;
+            // Dirección deseada normalizada
+            Vector3 desiredDirection = toTarget.normalized;
 
-            rbEnemy.velocity = direction;
+            // Obtener fuerza de evitación (ya normalizada)
+            Vector3 avoidance = obstacleAvoid.GetAvoidanceForce();
 
-            if (direction != Vector3.zero)
+            // Combinar direcciones ponderando la evitación
+            Vector3 finalDirection = Vector3.zero;
+
+            if (avoidance != Vector3.zero)
             {
-                enemy.transform.forward = direction;
+                // Priorizar evitación cuando hay obstáculos cercanos
+                finalDirection = avoidance.normalized;
+            }
+            else
+            {
+                // Usar dirección normal al patrullar
+                finalDirection = desiredDirection;
             }
 
-            float distanceToTarget = Vector3.Distance(enemy.transform.position, currentTarget.position);
+            // Aplicar velocidad manteniendo la magnitud constante
+            rbEnemy.velocity = finalDirection * maxVelocity;
+
+            // Rotación suave hacia la dirección final
+            if (finalDirection != Vector3.zero)
+            {
+                Quaternion targetRotation = Quaternion.LookRotation(finalDirection);
+                enemy.transform.rotation = Quaternion.Slerp(
+                    enemy.transform.rotation,
+                    targetRotation,
+                    Time.deltaTime * 5f
+                );
+            }
+
+            float distanceToTarget = toTarget.magnitude;
             if (distanceToTarget < distancePoint)
             {
                 StartCoroutine(PauseBeforeNextPoint());
             }
         }
-        else
+        else if (IsPatrolPause)
         {
-            if (IsPatrolPause)
-            {
-                rbEnemy.velocity = Vector3.zero;
-            }
+            rbEnemy.velocity = Vector3.zero;
         }
     }
 

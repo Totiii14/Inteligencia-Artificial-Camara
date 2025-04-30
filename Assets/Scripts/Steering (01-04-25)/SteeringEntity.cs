@@ -9,7 +9,7 @@ public class SteeringEntity : MonoBehaviour
     [SerializeField] float timePrediction;
 
     public SteeringMode mode;
-    private ISteering currentSteering;
+    public ISteering currentSteering;
     Vector3 steeringVelocity;
 
     Rigidbody rb;

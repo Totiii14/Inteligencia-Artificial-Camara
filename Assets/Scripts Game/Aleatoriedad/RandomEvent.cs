@@ -36,12 +36,9 @@ public class RandomEvent : MonoBehaviour
         if (playerDetection != null)
             playerDetection.SetDetectable(false);
 
-        Debug.Log("Se vino");
-
         yield return new WaitForSeconds(invisibilityDuration);
 
         Destroy(gameObject);
-        Debug.Log("Se gue");
         playerDetection.SetDetectable(true);
     }
 }

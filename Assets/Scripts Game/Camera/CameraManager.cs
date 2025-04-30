@@ -54,8 +54,7 @@ public class CameraManager : MonoBehaviour
     }
 
     private void OnPlayerDetected()
-    {
-        Debug.Log("¡Jugador detectado!");
+    { 
         enemyManager?.NotifyFriends(player.position);
     }
 
