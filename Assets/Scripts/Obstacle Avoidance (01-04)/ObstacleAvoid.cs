@@ -3,118 +3,94 @@ using UnityEngine;
 
 public class ObstacleAvoid : MonoBehaviour
 {
-    [Header("Detection")]
-    [SerializeField] private LayerMask obstacleLayer;
-    [SerializeField] private float detectDistance = 3f;
-    [SerializeField] private float sphereRadius = 0.5f;
-    [SerializeField] private float rayAngle = 30f;
-    [SerializeField] private int rayCount = 3; // Número de rayos por lado
+    [SerializeField] LayerMask obstacle;
+    [SerializeField] float distance;
 
-    [Header("Avoidance")]
-    [SerializeField] private float avoidForce = 10f;
-    [SerializeField] private float smoothTime = 0.3f; // Tiempo de suavizado
-    [SerializeField] private float minForceThreshold = 0.1f; // Fuerza mínima para aplicar
+    [SerializeField] bool isObstacle;
 
-    private Rigidbody rb;
-    private Vector3 currentAvoidance;
-    private Vector3 avoidanceVelocity;
+    Collider[] colliders;
 
-    private void Awake() => rb = GetComponent<Rigidbody>();
+    private Vector3 lastAvoidDirection;
+    private float avoidTimer;
+    [SerializeField] private float avoidHoldTime = 0.5f;
 
-    public Vector3 GetAvoidanceForce()
+    public bool IsObstacle { get => isObstacle; set => isObstacle = value; }
+
+    private void Update()
     {
-        Vector3 desiredAvoidance = CalculateAvoidance();
+        colliders = Physics.OverlapSphere(transform.position, 3, obstacle);
+        ObstacleAvoids();
 
-        // Suavizar la transición entre fuerzas
-        currentAvoidance = Vector3.SmoothDamp(
-            currentAvoidance,
-            desiredAvoidance,
-            ref avoidanceVelocity,
-            smoothTime
-        );
-
-        // Solo aplicar si supera el umbral mínimo
-        return currentAvoidance.magnitude > minForceThreshold ? currentAvoidance : Vector3.zero;
-    }
-
-    private Vector3 CalculateAvoidance()
-    {
-        Vector3 movementDirection = rb.velocity.normalized;
-        if (movementDirection == Vector3.zero) movementDirection = transform.forward;
-
-        Vector3 bestDirection = Vector3.zero;
-        float bestScore = 0f;
-
-        // Rayo central principal
-        if (Physics.SphereCast(transform.position, sphereRadius, movementDirection,
-            out RaycastHit mainHit, detectDistance, obstacleLayer))
+        if (!isObstacle)
         {
-            float danger = 1f - (mainHit.distance / detectDistance);
-
-            // Evaluar múltiples direcciones potenciales
-            for (int i = 0; i <= rayCount; i++)
-            {
-                float angle = rayAngle * (i / (float)rayCount);
-
-                // Probar ambos lados
-                EvaluateDirection(Quaternion.AngleAxis(angle, Vector3.up) * movementDirection, danger, ref bestDirection, ref bestScore);
-                EvaluateDirection(Quaternion.AngleAxis(-angle, Vector3.up) * movementDirection, danger, ref bestDirection, ref bestScore);
-            }
-
-            // Si no encontramos buena dirección, retroceder
-            if (bestScore <= 0)
-            {
-                bestDirection = -movementDirection * 0.5f;
-                bestScore = danger * 0.3f;
-            }
-        }
-
-        return bestDirection * avoidForce * bestScore;
-    }
-
-    private void EvaluateDirection(Vector3 direction, float danger, ref Vector3 bestDirection, ref float bestScore)
-    {
-        if (!Physics.Raycast(transform.position, direction, detectDistance * 0.8f, obstacleLayer))
-        {
-            // Puntuar dirección basada en qué tan lejos está de obstáculos y alineación con movimiento
-            float score = danger * (1f - Vector3.Angle(direction, transform.forward) / 180f);
-
-            if (score > bestScore)
-            {
-                bestScore = score;
-                bestDirection = direction;
-            }
+            avoidTimer = 0;
+            lastAvoidDirection = Vector3.zero;
         }
     }
 
-    private void OnDrawGizmos()
+    private void ObstacleAvoids()
     {
-        if (!Application.isPlaying) return;
+        float closestDistance = float.MaxValue;
+        Collider closestCollider = null;
 
-        Gizmos.color = Color.yellow;
-        Vector3 direction = rb.velocity.normalized;
-        if (direction == Vector3.zero) direction = transform.forward;
-
-        Gizmos.DrawLine(transform.position, transform.position + direction * detectDistance);
-        Gizmos.DrawWireSphere(transform.position + direction * detectDistance, sphereRadius);
-
-        // Dibujar direcciones evaluadas
-        Gizmos.color = Color.cyan;
-        for (int i = 0; i <= rayCount; i++)
+        foreach (Collider collider in colliders)
         {
-            float angle = rayAngle * (i / (float)rayCount);
-            Vector3 dir1 = Quaternion.AngleAxis(angle, Vector3.up) * direction;
-            Vector3 dir2 = Quaternion.AngleAxis(-angle, Vector3.up) * direction;
-
-            Gizmos.DrawLine(transform.position, transform.position + dir1 * detectDistance * 0.8f);
-            Gizmos.DrawLine(transform.position, transform.position + dir2 * detectDistance * 0.8f);
+            float dist = Vector3.Distance(transform.position, collider.ClosestPoint(transform.position));
+            if (dist < closestDistance)
+            {
+                closestDistance = dist;
+                closestCollider = collider;
+            }
         }
 
-        // Dibujar dirección de evitación actual
-        if (currentAvoidance != Vector3.zero)
+        if (closestCollider != null && closestDistance < 1f)
         {
-            Gizmos.color = Color.red;
-            Gizmos.DrawLine(transform.position, transform.position + currentAvoidance.normalized * 2f);
+            isObstacle = true;
+            SteeringEntity collEntity = GetComponent<SteeringEntity>();
+            collEntity.SteeringVelocity = NewDirection();
         }
+        else
+        {
+            isObstacle = false;
+        }
+    }
+
+    public Vector3 NewDirection()
+    {
+        if (avoidTimer > 0)
+        {
+            avoidTimer -= Time.deltaTime;
+            return lastAvoidDirection;
+        }
+
+        Ray fwd = new(transform.position, transform.forward);
+        Ray right = new(transform.position, transform.right);
+        Ray left = new(transform.position, -transform.right);
+        Ray back = new(transform.position, -transform.forward);
+
+        bool rayForward = Physics.Raycast(fwd, 7f, obstacle);
+        bool rayBack = Physics.Raycast(back, 7f, obstacle);
+        bool rayRight = Physics.Raycast(right, 7f, obstacle);
+        bool rayLeft = Physics.Raycast(left, 7f, obstacle);
+
+        if (!rayForward)
+            lastAvoidDirection = fwd.direction;
+        else if (!rayRight)
+            lastAvoidDirection = right.direction;
+        else if (!rayLeft)
+            lastAvoidDirection = left.direction;
+        else if (!rayBack)
+            lastAvoidDirection = back.direction;
+        else
+            lastAvoidDirection = Quaternion.Euler(0, Random.Range(0f, 360f), 0) * Vector3.forward; 
+
+        avoidTimer = avoidHoldTime;
+        return lastAvoidDirection;
+    }
+
+    private void OnDrawGizmosSelected()
+    {
+        Gizmos.color = Color.red;
+        Gizmos.DrawWireSphere(transform.position, 3f);
     }
 }

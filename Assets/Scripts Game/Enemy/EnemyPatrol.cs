@@ -16,7 +16,7 @@ public class EnemyPatrol : MonoBehaviour
     private Rigidbody rbEnemy;
     [SerializeField] private int currentPatrolIndex = 0;
     [field: SerializeField] public bool IsPause { get; set; }
-    [field: SerializeField] public bool IsPatrolPause { get; set; } 
+    [field: SerializeField] public bool IsPatrolPause { get; set; }
     [SerializeField] private bool isPatrollingForward = true;
 
     private void Awake()
@@ -39,30 +39,18 @@ public class EnemyPatrol : MonoBehaviour
             // Dirección deseada normalizada
             Vector3 desiredDirection = toTarget.normalized;
 
-            // Obtener fuerza de evitación (ya normalizada)
-            Vector3 avoidance = obstacleAvoid.GetAvoidanceForce();
-
-            // Combinar direcciones ponderando la evitación
-            Vector3 finalDirection = Vector3.zero;
-
-            if (avoidance != Vector3.zero)
-            {
-                // Priorizar evitación cuando hay obstáculos cercanos
-                finalDirection = avoidance.normalized;
-            }
+            if (!obstacleAvoid.IsObstacle)
+                rbEnemy.velocity = desiredDirection * maxVelocity;
             else
             {
-                // Usar dirección normal al patrullar
-                finalDirection = desiredDirection;
+                steering.rb.velocity = steering.SteeringVelocity.normalized * maxVelocity;
             }
 
-            // Aplicar velocidad manteniendo la magnitud constante
-            rbEnemy.velocity = finalDirection * maxVelocity;
 
             // Rotación suave hacia la dirección final
-            if (finalDirection != Vector3.zero)
+            if (desiredDirection != Vector3.zero)
             {
-                Quaternion targetRotation = Quaternion.LookRotation(finalDirection);
+                Quaternion targetRotation = Quaternion.LookRotation(desiredDirection);
                 enemy.transform.rotation = Quaternion.Slerp(
                     enemy.transform.rotation,
                     targetRotation,
@@ -88,7 +76,7 @@ public class EnemyPatrol : MonoBehaviour
         {
             IsPause = true;
             IsPatrolPause = true;
-            rbEnemy.velocity = Vector3.zero; 
+            rbEnemy.velocity = Vector3.zero;
             yield return new WaitForSeconds(pauseTime);
             IsPause = false;
             isPatrollingForward = false;
@@ -97,7 +85,7 @@ public class EnemyPatrol : MonoBehaviour
         {
             IsPause = true;
             IsPatrolPause = true;
-            rbEnemy.velocity = Vector3.zero; 
+            rbEnemy.velocity = Vector3.zero;
             yield return new WaitForSeconds(pauseTime);
             IsPause = false;
             isPatrollingForward = true;

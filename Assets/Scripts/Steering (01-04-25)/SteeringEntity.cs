@@ -12,7 +12,7 @@ public class SteeringEntity : MonoBehaviour
     public ISteering currentSteering;
     Vector3 steeringVelocity;
 
-    Rigidbody rb;
+    public Rigidbody rb;
     ObstacleAvoid obstacleAvoid;
     LineOfSight lineOfSight;
     public EnemyPatrol enemyPatrol { get; private set; }
@@ -86,24 +86,22 @@ public class SteeringEntity : MonoBehaviour
                 }
             }
 
-            Vector3 avoidanceForce = obstacleAvoid.GetAvoidanceForce();
-
-            Vector3 finalVelocity;
-
-            if (avoidanceForce != Vector3.zero)
+            if (!obstacleAvoid.IsObstacle)
             {
-                finalVelocity = avoidanceForce.normalized * maxVelocity;
+                steeringVelocity = currentSteering.MoveDirection();
             }
             else
             {
-                finalVelocity = currentSteering.MoveDirection();
+                Vector3 avoidDirection = obstacleAvoid.NewDirection(); 
+                steeringVelocity = avoidDirection * maxVelocity;
             }
 
-            rb.AddForce(finalVelocity, ForceMode.Acceleration);
+            rb.AddForce(steeringVelocity, ForceMode.Acceleration);
 
-            if (rb.velocity != Vector3.zero)
+            if (steeringVelocity != Vector3.zero)
             {
-                transform.forward = rb.velocity.normalized;
+                Quaternion targetRotation = Quaternion.LookRotation(steeringVelocity.normalized);
+                transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, Time.deltaTime * 5f);
             }
         }
         else
@@ -129,14 +127,14 @@ public class SteeringEntity : MonoBehaviour
         rb.angularVelocity = Vector3.zero;
         yield return new WaitForSeconds(3f);
 
-        if (!IsChasing) // recién chequeás después de esperar
+        if (!IsChasing) 
         {
             enemyPatrol.IsPause = false;
             enemyPatrol.IsPatrolPause = false;
             enemyPatrol.Patrol();
         }
 
-        backToPatrolCoroutine = null; // importante limpiar la variable
+        backToPatrolCoroutine = null; 
     }
 
     public void GoToLastSeenPosition(Vector3 lastPosition)

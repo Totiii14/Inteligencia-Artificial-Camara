@@ -1853,10 +1853,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6e3393d040c859647bbc2fb6b408df72, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  target: {fileID: 467448066}
+  <Target>k__BackingField: {fileID: 467448064}
+  targetRb: {fileID: 467448066}
   maxVelocity: 2
   timePrediction: 1
   mode: 0
+  rb: {fileID: 0}
+  IsOnView: 0
 --- !u!54 &1443990190
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -1899,7 +1902,7 @@ MonoBehaviour:
   obstacle:
     serializedVersion: 2
     m_Bits: 8
-  distance: 0
+  distance: 2
   isObstacle: 0
 --- !u!114 &1443990192
 MonoBehaviour:
@@ -2662,12 +2665,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a2f6057aea9a67c43a08d6929468dfd4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  securityCamera: {fileID: 304960758}
-  detectionRange: 8
-  detectionAngle: 70
-  obstaclesMask:
+  <SecurityCamera>k__BackingField: {fileID: 0}
+  <DetectionRange>k__BackingField: 0
+  <DetectionAngle>k__BackingField: 0
+  <ObstaclesMask>k__BackingField:
     serializedVersion: 2
-    m_Bits: 8
+    m_Bits: 0
+  <VerticalAngleOffset>k__BackingField: 0
 --- !u!1 &7992906488934345732
 GameObject:
   m_ObjectHideFlags: 0
