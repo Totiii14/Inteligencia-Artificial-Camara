@@ -3,16 +3,14 @@ using UnityEngine;
 
 public class ObstacleAvoid : MonoBehaviour
 {
-    [SerializeField] LayerMask obstacle;
-    [SerializeField] float distance;
+    [SerializeField] private LayerMask obstacle;
+    [SerializeField] private float distance;
 
-    [SerializeField] bool isObstacle;
+    [SerializeField] private bool isObstacle;
 
-    Collider[] colliders;
+    private Collider[] colliders;
 
     private Vector3 lastAvoidDirection;
-    private float avoidTimer;
-    [SerializeField] private float avoidHoldTime = 0.5f;
 
     public bool IsObstacle { get => isObstacle; set => isObstacle = value; }
 
@@ -23,7 +21,6 @@ public class ObstacleAvoid : MonoBehaviour
 
         if (!isObstacle)
         {
-            avoidTimer = 0;
             lastAvoidDirection = Vector3.zero;
         }
     }
@@ -57,12 +54,6 @@ public class ObstacleAvoid : MonoBehaviour
 
     public Vector3 NewDirection()
     {
-        if (avoidTimer > 0)
-        {
-            avoidTimer -= Time.deltaTime;
-            return lastAvoidDirection;
-        }
-
         Ray fwd = new(transform.position, transform.forward);
         Ray right = new(transform.position, transform.right);
         Ray left = new(transform.position, -transform.right);
@@ -81,10 +72,7 @@ public class ObstacleAvoid : MonoBehaviour
             lastAvoidDirection = left.direction;
         else if (!rayBack)
             lastAvoidDirection = back.direction;
-        else
-            lastAvoidDirection = Quaternion.Euler(0, Random.Range(0f, 360f), 0) * Vector3.forward; 
 
-        avoidTimer = avoidHoldTime;
         return lastAvoidDirection;
     }
 

@@ -15,26 +15,6 @@ public class State
         transitions[input] = newState;
     }
 
-    //las 2 formas de remover las transiciones
-
-    public void RemoveTransition(PlayerStates input)
-    {
-        if (transitions.ContainsKey(input))
-            transitions.Remove(input);
-    }
-
-    public void RemoveTransition(State state)
-    {
-        foreach (KeyValuePair<PlayerStates, State> pair in transitions)
-        {
-            if (pair.Value == state)
-            {
-                transitions.Remove(pair.Key);
-                break;
-            }
-        }
-    }
-
     public State GetTransition(PlayerStates input)
     {
         if (transitions.TryGetValue(input, out State nextState))

@@ -5,7 +5,6 @@ public class PlayerModel
     public PlayerFSM Data { get; private set; }
     private Rigidbody rb;
     private float startYScale;
-    private bool isGrounded;
 
     public PlayerModel(PlayerFSM data, Rigidbody rb)
     {

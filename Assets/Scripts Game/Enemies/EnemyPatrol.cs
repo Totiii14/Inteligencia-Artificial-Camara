@@ -4,8 +4,8 @@ using UnityEngine;
 
 public class EnemyPatrol : MonoBehaviour
 {
-    [SerializeField] List<GameObject> patrolPath;
-    [SerializeField] GameObject enemy;
+    [SerializeField] private List<GameObject> patrolPath;
+    [SerializeField] private GameObject enemy;
     [SerializeField] private int maxVelocity;
     [SerializeField] private float distancePoint = 1f;
     [SerializeField] private float pauseTime = 2f;
@@ -36,7 +36,6 @@ public class EnemyPatrol : MonoBehaviour
             Vector3 toTarget = (currentTarget.position - enemy.transform.position);
             toTarget.y = 0;
 
-            // Dirección deseada normalizada
             Vector3 desiredDirection = toTarget.normalized;
 
             if (!obstacleAvoid.IsObstacle)
@@ -47,7 +46,6 @@ public class EnemyPatrol : MonoBehaviour
             }
 
 
-            // Rotación suave hacia la dirección final
             if (desiredDirection != Vector3.zero)
             {
                 Quaternion targetRotation = Quaternion.LookRotation(desiredDirection);

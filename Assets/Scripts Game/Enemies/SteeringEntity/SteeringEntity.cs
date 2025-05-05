@@ -4,27 +4,25 @@ using UnityEngine;
 public class SteeringEntity : MonoBehaviour
 {
     [field: SerializeField] public Transform Target { get; private set; }
-    [SerializeField] Rigidbody targetRb;
-    [SerializeField] float maxVelocity;
-    [SerializeField] float timePrediction;
+    [SerializeField] private Rigidbody targetRb;
+    [SerializeField] private float maxVelocity;
+    [SerializeField] private float timePrediction;
 
     public SteeringMode mode;
     public ISteering currentSteering;
-    Vector3 steeringVelocity;
+    private Vector3 steeringVelocity;
 
-    public Rigidbody rb;
-    ObstacleAvoid obstacleAvoid;
-    LineOfSight lineOfSight;
+    public Rigidbody rb { get; set; }
+    private ObstacleAvoid obstacleAvoid;
+    private LineOfSight lineOfSight;
     public EnemyPatrol enemyPatrol { get; private set; }
-    EnemyManager enemyManager;
+    private EnemyManager enemyManager;
 
     private bool IsChasing = false;
-    public bool IsOnView;
+    public bool IsOnView { get; private set; }
     public Vector3 SteeringVelocity { get => steeringVelocity; set => steeringVelocity = value; }
 
     private Coroutine backToPatrolCoroutine;
-
-    //ExampleTeacher obstacleAv;
 
     public enum SteeringMode
     {
@@ -45,7 +43,6 @@ public class SteeringEntity : MonoBehaviour
 
     void Start()
     {
-        //obstacleAv = GetComponent<ExampleTeacher>();
         Persuit persuit = new(rb, targetRb, maxVelocity, timePrediction);
         Evade evade = new(rb, targetRb, maxVelocity, timePrediction);
         switch (mode)
@@ -92,7 +89,7 @@ public class SteeringEntity : MonoBehaviour
             }
             else
             {
-                Vector3 avoidDirection = obstacleAvoid.NewDirection(); 
+                Vector3 avoidDirection = obstacleAvoid.NewDirection();
                 steeringVelocity = avoidDirection * maxVelocity;
             }
 
@@ -127,14 +124,14 @@ public class SteeringEntity : MonoBehaviour
         rb.angularVelocity = Vector3.zero;
         yield return new WaitForSeconds(3f);
 
-        if (!IsChasing) 
+        if (!IsChasing)
         {
             enemyPatrol.IsPause = false;
             enemyPatrol.IsPatrolPause = false;
             enemyPatrol.Patrol();
         }
 
-        backToPatrolCoroutine = null; 
+        backToPatrolCoroutine = null;
     }
 
     public void GoToLastSeenPosition(Vector3 lastPosition)
@@ -147,15 +144,4 @@ public class SteeringEntity : MonoBehaviour
             }
         }
     }
-
-    //private void OnDrawGizmos()
-    //{
-    //    Gizmos.color = Color.green;
-    //    Gizmos.DrawLine(rb.position, rb.position + rb.velocity * 3);
-
-    //    Gizmos.color = Color.blue;
-    //    Gizmos.DrawLine(rb.position, rb.position + desiredVelocity);
-
-    //    Gizmos.DrawWireSphere(target.position + target.velocity * timePrediction * Vector3.Distance(rb.position, target.position) * 0.1f, 2);
-    //}
 }
