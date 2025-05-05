@@ -37,27 +37,60 @@ public class VisionCone : MonoBehaviour
         Vector3 forward = Quaternion.Euler(lineOfSight.VerticalAngleOffset, 0f, 0f) * lineOfSight.SecurityCamera.forward;
         float angle = lineOfSight.DetectionAngle;
         float radius = lineOfSight.DetectionRange;
+        float height = 2f;
 
-        Vector3[] vertices = new Vector3[segments + 2];
-        int[] triangles = new int[segments * 3];
+        int vertCount = (segments + 1) * 2 + 2;
+        Vector3[] vertices = new Vector3[vertCount];
+        int[] triangles = new int[segments * 12];
 
-        vertices[0] = transform.InverseTransformPoint(origin);
+        Vector3 baseCenter = origin;
+        Vector3 topCenter = origin + Vector3.down * height;
+
+        vertices[0] = transform.InverseTransformPoint(baseCenter);
+        vertices[1] = transform.InverseTransformPoint(topCenter);
 
         for (int i = 0; i <= segments; i++)
         {
             float currentAngle = -angle / 2f + (angle * i / segments);
             Quaternion rotation = Quaternion.Euler(0f, currentAngle, 0f);
             Vector3 direction = rotation * forward;
-            Vector3 point = origin + direction.normalized * radius;
+            Vector3 basePoint = baseCenter + direction.normalized * radius;
+            Vector3 topPoint = basePoint + Vector3.down * height;
 
-            vertices[i + 1] = transform.InverseTransformPoint(point);
+            vertices[2 + i] = transform.InverseTransformPoint(basePoint);
+            vertices[2 + segments + 1 + i] = transform.InverseTransformPoint(topPoint);
+        }
+
+        int triIndex = 0;
+
+        for (int i = 0; i < segments; i++)
+        {
+            triangles[triIndex++] = 0;
+            triangles[triIndex++] = 2 + i;
+            triangles[triIndex++] = 2 + i + 1;
         }
 
         for (int i = 0; i < segments; i++)
         {
-            triangles[i * 3 + 0] = 0;
-            triangles[i * 3 + 1] = i + 1;
-            triangles[i * 3 + 2] = i + 2;
+            triangles[triIndex++] = 1;
+            triangles[triIndex++] = 2 + segments + 1 + i + 1;
+            triangles[triIndex++] = 2 + segments + 1 + i;
+        }
+
+        for (int i = 0; i < segments; i++)
+        {
+            int baseA = 2 + i;
+            int baseB = 2 + i + 1;
+            int topA = 2 + segments + 1 + i;
+            int topB = 2 + segments + 1 + i + 1;
+
+            triangles[triIndex++] = baseA;
+            triangles[triIndex++] = baseB;
+            triangles[triIndex++] = topA;
+
+            triangles[triIndex++] = topA;
+            triangles[triIndex++] = baseB;
+            triangles[triIndex++] = topB;
         }
 
         mesh.Clear();

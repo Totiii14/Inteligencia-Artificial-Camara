@@ -54,31 +54,51 @@ public class ObstacleAvoid : MonoBehaviour
 
     public Vector3 NewDirection()
     {
-        Ray fwd = new(transform.position, transform.forward);
-        Ray right = new(transform.position, transform.right);
-        Ray left = new(transform.position, -transform.right);
-        Ray back = new(transform.position, -transform.forward);
+        Vector3[] directions = new Vector3[]
+    {
+    transform.forward,
+    transform.right,
+    -transform.right,
+    -transform.forward,
+    (transform.forward + transform.right).normalized,
+    (transform.forward - transform.right).normalized,
+    (-transform.forward + transform.right).normalized,
+    (-transform.forward - transform.right).normalized
+    };
 
-        bool rayForward = Physics.Raycast(fwd, 7f, obstacle);
-        bool rayBack = Physics.Raycast(back, 7f, obstacle);
-        bool rayRight = Physics.Raycast(right, 7f, obstacle);
-        bool rayLeft = Physics.Raycast(left, 7f, obstacle);
+        foreach (Vector3 dir in directions)
+        {
+            if (!Physics.Raycast(transform.position, dir, 7f, obstacle))
+            {
+                lastAvoidDirection = dir;
+                return lastAvoidDirection;
+            }
+        }
 
-        if (!rayForward)
-            lastAvoidDirection = fwd.direction;
-        else if (!rayRight)
-            lastAvoidDirection = right.direction;
-        else if (!rayLeft)
-            lastAvoidDirection = left.direction;
-        else if (!rayBack)
-            lastAvoidDirection = back.direction;
-
-        return lastAvoidDirection;
+        return lastAvoidDirection != Vector3.zero ? lastAvoidDirection : -transform.forward;
     }
 
     private void OnDrawGizmosSelected()
     {
         Gizmos.color = Color.red;
         Gizmos.DrawWireSphere(transform.position, 3f);
+
+        Vector3[] directions = new Vector3[]
+        {
+    transform.forward,
+    transform.right,
+    -transform.right,
+    -transform.forward,
+    (transform.forward + transform.right).normalized,
+    (transform.forward - transform.right).normalized,
+    (-transform.forward + transform.right).normalized,
+    (-transform.forward - transform.right).normalized
+        };
+
+        Gizmos.color = Color.yellow;
+        foreach (var dir in directions)
+        {
+            Gizmos.DrawRay(transform.position, dir * 7f);
+        }
     }
 }

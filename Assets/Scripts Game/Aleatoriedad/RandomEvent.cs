@@ -29,6 +29,7 @@ public class RandomEvent : MonoBehaviour
     private void NotifyEnemies(Vector3 playerPosition)
     {
         enemyManager?.NotifyFriends(playerPosition);
+        Destroy(gameObject);
     }
 
     private IEnumerator BecomeInvisibleTemporarily()
