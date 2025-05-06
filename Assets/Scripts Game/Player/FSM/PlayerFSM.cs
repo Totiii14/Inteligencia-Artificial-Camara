@@ -6,10 +6,7 @@ public class PlayerFSM : MonoBehaviour
     [Header("Movement Settings")]
     public float walkSpeed = 4f;
     public float sprintSpeed = 6f;
-    public float crouchSpeed = 2f;
-    public float jumpForce = 5f;
     public float groundDrag = 5f;
-    public float airMultiplier = 0.5f;
     public float playerHeight = 2f;
     public LayerMask groundLayer;
 

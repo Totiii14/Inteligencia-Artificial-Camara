@@ -5420,7 +5420,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   <Target>k__BackingField: {fileID: 773869276}
   targetRb: {fileID: 773869275}
-  maxVelocity: 25
+  maxVelocity: 20
   timePrediction: 0.2
   mode: 2
 --- !u!54 &407112979
@@ -7999,7 +7999,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   <Target>k__BackingField: {fileID: 773869276}
   targetRb: {fileID: 773869275}
-  maxVelocity: 25
+  maxVelocity: 20
   timePrediction: 0.2
   mode: 2
 --- !u!54 &560392548
@@ -8394,7 +8394,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   <Target>k__BackingField: {fileID: 773869276}
   targetRb: {fileID: 773869275}
-  maxVelocity: 25
+  maxVelocity: 20
   timePrediction: 0.2
   mode: 2
 --- !u!54 &572894514
@@ -12250,10 +12250,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   walkSpeed: 180
   sprintSpeed: 220
-  crouchSpeed: 2
-  jumpForce: 500
   groundDrag: 5
-  airMultiplier: 0.7
   playerHeight: 2
   groundLayer:
     serializedVersion: 2
@@ -24817,7 +24814,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   <Target>k__BackingField: {fileID: 773869276}
   targetRb: {fileID: 773869275}
-  maxVelocity: 25
+  maxVelocity: 20
   timePrediction: 0.2
   mode: 2
 --- !u!54 &1458339890
@@ -28972,7 +28969,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   <Target>k__BackingField: {fileID: 773869276}
   targetRb: {fileID: 773869275}
-  maxVelocity: 25
+  maxVelocity: 20
   timePrediction: 0.2
   mode: 3
 --- !u!54 &1771780160
@@ -32178,7 +32175,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   <Target>k__BackingField: {fileID: 773869276}
   targetRb: {fileID: 773869275}
-  maxVelocity: 25
+  maxVelocity: 20
   timePrediction: 0.2
   mode: 3
 --- !u!114 &1951815523

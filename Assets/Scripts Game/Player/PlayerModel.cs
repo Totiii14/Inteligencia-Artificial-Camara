@@ -18,8 +18,6 @@ public class PlayerModel
         Vector3 moveDir = Data.orientation.forward * dir.z + Data.orientation.right * dir.x;
         if (IsGrounded())
             rb.AddForce(moveDir.normalized * speed * 10f * Time.deltaTime, ForceMode.Force);
-        else
-            rb.AddForce(moveDir.normalized * speed * 10f * Data.airMultiplier * Time.deltaTime, ForceMode.Force);
     }
 
     public bool IsGrounded()
