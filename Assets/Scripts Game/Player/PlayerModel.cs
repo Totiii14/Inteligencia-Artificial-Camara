@@ -22,15 +22,6 @@ public class PlayerModel
             rb.AddForce(moveDir.normalized * speed * 10f * Data.airMultiplier * Time.deltaTime, ForceMode.Force);
     }
 
-    public void Jump()
-    {
-        if (IsGrounded())
-        {
-            rb.velocity = new Vector3(rb.velocity.x, 0f, rb.velocity.z) * Time.deltaTime;
-            rb.AddForce(Vector3.up * Data.jumpForce * Time.deltaTime, ForceMode.Impulse);
-        }
-    }
-
     public bool IsGrounded()
     {
         float checkDistance = (Data.transform.localScale.y / startYScale) * (Data.playerHeight * 0.5f + 0.2f);

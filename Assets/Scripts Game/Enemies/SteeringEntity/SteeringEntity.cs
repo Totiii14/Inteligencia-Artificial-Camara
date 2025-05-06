@@ -89,13 +89,16 @@ public class SteeringEntity : MonoBehaviour
             }
             else
             {
-                Vector3 avoidDirection = obstacleAvoid.NewDirection();
-                steeringVelocity = avoidDirection * maxVelocity;
+                Vector3 avoidDir = obstacleAvoid.GetAvoidDirection();
+                if (avoidDir != Vector3.zero)
+                    steeringVelocity = avoidDir;
+                else
+                    steeringVelocity = Vector3.zero; 
             }
 
             rb.AddForce(steeringVelocity, ForceMode.Acceleration);
 
-            if (steeringVelocity != Vector3.zero)
+            if (steeringVelocity.sqrMagnitude > 0.01f)
             {
                 Quaternion targetRotation = Quaternion.LookRotation(steeringVelocity.normalized);
                 transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, Time.deltaTime * 5f);

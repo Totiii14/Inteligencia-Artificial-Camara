@@ -21,17 +21,8 @@ public class PlayerStateSprint : State
         Vector2 input = _model.GetInput();
         Vector3 dir = new Vector3(input.x, 0f, input.y);
 
-        if (Input.GetKeyDown(KeyCode.Space) && _model.IsGrounded())
-        {
-            _model.Jump();
-            _fsm.Transition(PlayerStates.Air);
-        }
-
         if (!Input.GetKey(KeyCode.LeftShift) || input.magnitude < 0.1f)
             _fsm.Transition(PlayerStates.Move);
-
-        if (!_model.IsGrounded())
-            _fsm.Transition(PlayerStates.Air);
 
         _model.Move(dir, _model.Data.sprintSpeed);
     }

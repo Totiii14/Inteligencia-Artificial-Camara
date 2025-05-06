@@ -41,9 +41,7 @@ public class EnemyPatrol : MonoBehaviour
             if (!obstacleAvoid.IsObstacle)
                 rbEnemy.velocity = desiredDirection * maxVelocity;
             else
-            {
-                steering.rb.velocity = steering.SteeringVelocity.normalized * maxVelocity;
-            }
+                rbEnemy.velocity = obstacleAvoid.GetAvoidDirection().normalized * maxVelocity;
 
 
             if (desiredDirection != Vector3.zero)

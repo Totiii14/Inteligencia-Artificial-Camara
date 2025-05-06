@@ -20,20 +20,11 @@ public class PlayerStateIdle : State
     {
         Vector2 input = _model.GetInput();
 
-        if (Input.GetKeyDown(KeyCode.Space) && _model.IsGrounded())
-        {
-            _model.Jump();
-            _fsm.Transition(PlayerStates.Air);
-        }
-
-            if (Input.GetKey(KeyCode.LeftShift) && input.magnitude > 0.1f)
+        if (Input.GetKey(KeyCode.LeftShift) && input.magnitude > 0.1f)
             _fsm.Transition(PlayerStates.Sprint);
 
         else if (input.magnitude > 0.1f)
             _fsm.Transition(PlayerStates.Move);
-
-        if (!_model.IsGrounded())
-            _fsm.Transition(PlayerStates.Air);
 
         _model.Move(Vector3.zero, 0f);
     }

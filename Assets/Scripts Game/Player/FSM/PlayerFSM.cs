@@ -1,5 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using static PlayerStatesEnum;
 
@@ -37,24 +35,15 @@ public class PlayerFSM : MonoBehaviour
         PlayerStateIdle idle = new PlayerStateIdle(fsm, model);
         PlayerStateWalk walk = new PlayerStateWalk(fsm, model);
         PlayerStateSprint sprint = new PlayerStateSprint(fsm, model);
-        PlayerStateAir air = new PlayerStateAir(fsm, model);
 
-        // --- TRANSICIONES ---
         idle.AddTransition(PlayerStates.Move, walk);
         idle.AddTransition(PlayerStates.Sprint, sprint);
-        idle.AddTransition(PlayerStates.Air, air);
 
         walk.AddTransition(PlayerStates.Idle, idle);
         walk.AddTransition(PlayerStates.Sprint, sprint);
-        walk.AddTransition(PlayerStates.Air, air);
 
         sprint.AddTransition(PlayerStates.Idle, idle);
         sprint.AddTransition(PlayerStates.Move, walk);
-        sprint.AddTransition(PlayerStates.Air, air);
-
-        air.AddTransition(PlayerStates.Idle, idle);
-        air.AddTransition(PlayerStates.Move, walk);
-        air.AddTransition(PlayerStates.Sprint, sprint);
 
         fsm.SetInit(idle);
     }

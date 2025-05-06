@@ -4,7 +4,6 @@ public class PlayerStatesEnum
     {
         Idle,
         Move,
-        Sprint,
-        Air
+        Sprint
     }
 }

@@ -3,102 +3,96 @@ using UnityEngine;
 
 public class ObstacleAvoid : MonoBehaviour
 {
-    [SerializeField] private LayerMask obstacle;
-    [SerializeField] private float distance;
+    [SerializeField] private LayerMask obstacleMask;
+    [SerializeField] private float rayDistance = 3f;
+    [SerializeField] private float avoidForce = 10f;
+    [SerializeField] private float frontRayOffset = 0.5f;
 
-    [SerializeField] private bool isObstacle;
+    public bool IsObstacle { get; private set; }
 
-    private Collider[] colliders;
+    private Vector3 avoidanceDirection = Vector3.zero;
+    private float avoidCooldown = 0f;
 
-    private Vector3 lastAvoidDirection;
-
-    public bool IsObstacle { get => isObstacle; set => isObstacle = value; }
 
     private void Update()
     {
-        colliders = Physics.OverlapSphere(transform.position, 3, obstacle);
-        ObstacleAvoids();
 
-        if (!isObstacle)
+        avoidCooldown -= Time.deltaTime;
+        if (avoidCooldown <= 0f)
         {
-            lastAvoidDirection = Vector3.zero;
+            CheckForObstacles();
+            avoidCooldown = 0.1f; // 10 veces por segundo
         }
     }
 
-    private void ObstacleAvoids()
+    private void CheckForObstacles()
     {
-        float closestDistance = float.MaxValue;
-        Collider closestCollider = null;
+        avoidanceDirection = Vector3.zero;
+        IsObstacle = false;
 
-        foreach (Collider collider in colliders)
+        Vector3 forward = transform.forward;
+        Vector3 right = transform.right;
+
+        Vector3[] rayDirections = new Vector3[]
         {
-            float dist = Vector3.Distance(transform.position, collider.ClosestPoint(transform.position));
-            if (dist < closestDistance)
+            forward,                           // centro
+            (forward + right).normalized,      // diagonal derecha
+            (forward - right).normalized,      // diagonal izquierda
+            right,                             // lateral derecha
+            -right                             // lateral izquierda
+        };
+
+        foreach (Vector3 dir in rayDirections)
+        {
+            Vector3 origin = transform.position + Vector3.up * 0.5f; // altura media
+            if (Physics.Raycast(origin, dir, out RaycastHit hit, rayDistance, obstacleMask))
             {
-                closestDistance = dist;
-                closestCollider = collider;
+                IsObstacle = true;
+                avoidanceDirection += -dir * (1f - hit.distance / rayDistance); // más cerca, más fuerza
             }
         }
 
-        if (closestCollider != null && closestDistance < 1f)
+        if (IsObstacle && avoidanceDirection != Vector3.zero)
         {
-            isObstacle = true;
-            SteeringEntity collEntity = GetComponent<SteeringEntity>();
-            collEntity.SteeringVelocity = NewDirection();
+            // Suaviza la dirección de evasión con Lerp para evitar oscilaciones bruscas
+            avoidanceDirection = Vector3.Lerp(transform.forward, avoidanceDirection.normalized, 0.5f);
         }
-        else
-        {
-            isObstacle = false;
-        }
+
+        avoidanceDirection = avoidanceDirection.normalized;
     }
 
-    public Vector3 NewDirection()
+    public Vector3 GetAvoidDirection()
     {
-        Vector3[] directions = new Vector3[]
-    {
-    transform.forward,
-    transform.right,
-    -transform.right,
-    -transform.forward,
-    (transform.forward + transform.right).normalized,
-    (transform.forward - transform.right).normalized,
-    (-transform.forward + transform.right).normalized,
-    (-transform.forward - transform.right).normalized
-    };
-
-        foreach (Vector3 dir in directions)
-        {
-            if (!Physics.Raycast(transform.position, dir, 7f, obstacle))
-            {
-                lastAvoidDirection = dir;
-                return lastAvoidDirection;
-            }
-        }
-
-        return lastAvoidDirection != Vector3.zero ? lastAvoidDirection : -transform.forward;
+        return IsObstacle ? avoidanceDirection * avoidForce : Vector3.zero;
     }
 
     private void OnDrawGizmosSelected()
     {
-        Gizmos.color = Color.red;
-        Gizmos.DrawWireSphere(transform.position, 3f);
+        if (!Application.isPlaying) return;
 
-        Vector3[] directions = new Vector3[]
+        Gizmos.color = Color.red;
+        Vector3 origin = transform.position + Vector3.up * 0.5f;
+        Vector3 forward = transform.forward;
+        Vector3 right = transform.right;
+
+        Vector3[] rayDirections = new Vector3[]
         {
-    transform.forward,
-    transform.right,
-    -transform.right,
-    -transform.forward,
-    (transform.forward + transform.right).normalized,
-    (transform.forward - transform.right).normalized,
-    (-transform.forward + transform.right).normalized,
-    (-transform.forward - transform.right).normalized
+            forward,
+            (forward + right).normalized,
+            (forward - right).normalized,
+            right,
+            -right
         };
 
-        Gizmos.color = Color.yellow;
-        foreach (var dir in directions)
+        foreach (Vector3 dir in rayDirections)
         {
-            Gizmos.DrawRay(transform.position, dir * 7f);
+            Gizmos.DrawRay(origin, dir * rayDistance);
+        }
+
+        if (IsObstacle)
+        {
+            Gizmos.color = Color.green;
+            Gizmos.DrawRay(transform.position, avoidanceDirection * avoidForce);
         }
     }
 }
