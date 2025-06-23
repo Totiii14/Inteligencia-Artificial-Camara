@@ -4,60 +4,60 @@ using UnityEngine;
 
 public class EnemyPatrol : MonoBehaviour
 {
-    [SerializeField] private List<GameObject> patrolPath;
-    [SerializeField] private GameObject enemy;
-    [SerializeField] private int maxVelocity;
-    [SerializeField] private float distancePoint = 1f;
-    [SerializeField] private float pauseTime = 2f;
-    private SteeringEntity steering;
-    private ObstacleAvoid obstacleAvoid;
+    [SerializeField] Node currentNode;
+    [SerializeField] Node startNode;
+    [SerializeField] Node endNode;
+    [SerializeField] List<Node> path = new List<Node>();
 
-
-    private Rigidbody rbEnemy;
-    [SerializeField] private int currentPatrolIndex = 0;
+    [SerializeField] private float maxVelocity;
     [field: SerializeField] public bool IsPause { get; set; }
     [field: SerializeField] public bool IsPatrolPause { get; set; }
-    [SerializeField] private bool isPatrollingForward = true;
+    [SerializeField] bool isBack;
+    
+    private ObstacleAvoid obstacleAvoid;
+    private Rigidbody rbEnemy;
+    private bool isReturning = false;
 
     private void Awake()
     {
-        rbEnemy = enemy.GetComponent<Rigidbody>();
-        steering = enemy.GetComponent<SteeringEntity>();
-        obstacleAvoid = enemy.GetComponent<ObstacleAvoid>();
+        rbEnemy = GetComponent<Rigidbody>();
+        obstacleAvoid = GetComponent<ObstacleAvoid>();
+        currentNode = startNode;
     }
 
     public void Patrol()
     {
-        if (patrolPath == null || patrolPath.Count == 0) return;
-
         if (!IsPause)
         {
-            Transform currentTarget = patrolPath[currentPatrolIndex].transform;
-            Vector3 toTarget = (currentTarget.position - enemy.transform.position);
-            toTarget.y = 0;
-
-            Vector3 desiredDirection = toTarget.normalized;
-
-            if (!obstacleAvoid.IsObstacle)
-                rbEnemy.velocity = desiredDirection * maxVelocity;
-            else
-                rbEnemy.velocity = obstacleAvoid.GetAvoidDirection().normalized * maxVelocity;
-
-
-            if (desiredDirection != Vector3.zero)
+            if (currentNode != endNode && !isBack)
             {
-                Quaternion targetRotation = Quaternion.LookRotation(desiredDirection);
-                enemy.transform.rotation = Quaternion.Slerp(
-                    enemy.transform.rotation,
-                    targetRotation,
-                    Time.deltaTime * 5f
-                );
+                CreatePath();
+            }
+            else if (currentNode == endNode && !isBack && !isReturning)
+            {
+                StartCoroutine(PauseAtEnd(() => BackToStart()));
+            }
+            else if (currentNode != startNode && isBack)
+            {
+                CreatePath();
+            }
+            else if (currentNode == startNode && isBack && !isReturning)
+            {
+                StartCoroutine(PauseAtEnd(() => isBack = false));
             }
 
-            float distanceToTarget = toTarget.magnitude;
-            if (distanceToTarget < distancePoint)
+            if (obstacleAvoid.IsObstacle)
             {
-                StartCoroutine(PauseBeforeNextPoint());
+                Vector3 avoidDir = obstacleAvoid.GetAvoidDirection().normalized;
+                rbEnemy.velocity = avoidDir * maxVelocity;
+
+                if (avoidDir != Vector3.zero)
+                {
+                    Quaternion targetRotation = Quaternion.LookRotation(avoidDir);
+                    transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, Time.deltaTime * 5f);
+                }
+
+                return; 
             }
         }
         else if (IsPatrolPause)
@@ -66,52 +66,93 @@ public class EnemyPatrol : MonoBehaviour
         }
     }
 
-    private IEnumerator PauseBeforeNextPoint()
+    public void CreatePath()
     {
-        if (currentPatrolIndex == patrolPath.Count - 1 && isPatrollingForward)
+        if (path.Count > 0)
         {
-            IsPause = true;
-            IsPatrolPause = true;
-            rbEnemy.velocity = Vector3.zero;
-            yield return new WaitForSeconds(pauseTime);
-            IsPause = false;
-            isPatrollingForward = false;
-        }
-        else if (currentPatrolIndex == 0 && !isPatrollingForward)
-        {
-            IsPause = true;
-            IsPatrolPause = true;
-            rbEnemy.velocity = Vector3.zero;
-            yield return new WaitForSeconds(pauseTime);
-            IsPause = false;
-            isPatrollingForward = true;
+            int x = 0;
+            Vector3 toTarget = path[x].transform.position - transform.position;
+            toTarget.y = 0;
+            Vector3 direction = toTarget.normalized;
+
+            rbEnemy.velocity = direction * maxVelocity;
+
+            if (direction != Vector3.zero)
+            {
+                Quaternion targetRotation = Quaternion.LookRotation(direction);
+                transform.rotation = Quaternion.RotateTowards(transform.rotation, targetRotation, 360f * Time.deltaTime);
+            }
+
+            if (Vector3.Distance(transform.position, path[x].transform.position) < 0.05f)
+            {
+                currentNode = path[x];
+                path.RemoveAt(x);
+            }
         }
         else
         {
-            if (isPatrollingForward)
+            Node[] nodes = FindObjectsOfType<Node>();
+
+            if (!AStarManager.instance.IsAllNodes)
             {
-                currentPatrolIndex++;
+                AStarManager.instance.CreateConnections(nodes);
+                AStarManager.instance.IsAllNodes = true;
             }
-            else
+
+            List<Node> intermediateNodes = new List<Node>();
+
+            Node randomNode = nodes[UnityEngine.Random.Range(0, nodes.Length)];
+            if (randomNode != currentNode && randomNode != endNode && !intermediateNodes.Contains(randomNode))
             {
-                currentPatrolIndex--;
+                intermediateNodes.Add(randomNode);
             }
+
+            List<Node> totalPath = new List<Node>();
+
+            Node lastNode = currentNode;
+
+            foreach (Node intermediate in intermediateNodes)
+            {
+                List<Node> partialPath = AStarManager.instance.GeneratePath(lastNode, intermediate);
+                if (partialPath != null && partialPath.Count > 0)
+                {
+                    totalPath.AddRange(partialPath);
+                    lastNode = intermediate;
+                }
+            }
+
+            List<Node> finalPath = AStarManager.instance.GeneratePath(lastNode, endNode);
+            if (finalPath != null && finalPath.Count > 0)
+            {
+                totalPath.AddRange(finalPath);
+            }
+
+            path = totalPath;
         }
     }
 
-    private void OnDrawGizmos()
+    public void BackToStart()
     {
-        if (patrolPath == null || patrolPath.Count == 0) return;
+        isReturning = true;
+        isBack = true;
 
-        Gizmos.color = Color.green;
-        for (int i = 0; i < patrolPath.Count; i++)
+        List<Node> backPath = AStarManager.instance.GeneratePath(currentNode, startNode);
+        if (backPath != null && backPath.Count > 0)
         {
-            if (patrolPath[i] != null)
-                Gizmos.DrawSphere(patrolPath[i].transform.position, 0.3f);
-
-            if (i < patrolPath.Count - 1)
-                Gizmos.DrawLine(patrolPath[i].transform.position, patrolPath[i + 1].transform.position);
+            path.AddRange(backPath);
         }
+        isReturning = false;
+    }
+
+    private IEnumerator PauseAtEnd(System.Action afterPauseAction)
+    {
+        IsPause = true;
+        rbEnemy.velocity = Vector3.zero;
+
+        yield return new WaitForSeconds(3f);
+
+        IsPause = false;
+        afterPauseAction?.Invoke(); 
     }
 }
 

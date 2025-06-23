@@ -82,7 +82,7 @@ public class CameraManager : MonoBehaviour
             }
         }
 
-        transform.localRotation = Quaternion.Euler(0f, yRotation, 0f);
+        transform.localRotation = Quaternion.Euler(13f, yRotation, 0f);
     }
 
     private float NormalizeAngle(float angle)
