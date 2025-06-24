@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 using static SteeringEntity;
 
@@ -29,17 +28,31 @@ public class EnemyManager : MonoBehaviour
     {
         foreach (SteeringEntity friend in persuitEnemies)
         {
+            if (friend.TryGetComponent(out Boid boid))
+            {
+                boid.enabled = true;
+            }
+
             if (friend.mode == SteeringMode.persuit)
             {
                 friend.enemyPatrol.IsPause = true;
                 friend.GoToLastSeenPosition(playerLastPosition);
+
+                Vector3 dirToTarget = (playerLastPosition - friend.transform.position).normalized;
+
+                if (dirToTarget != Vector3.zero)
+                {
+                    Quaternion targetRotation = Quaternion.LookRotation(dirToTarget);
+                    friend.transform.rotation = targetRotation;
+                }
             }
+
         }
     }
 
     private void OnCollisionEnter(Collision collision)
     {
-        if(steering.mode == SteeringMode.persuit && collision.transform.CompareTag("Player"))
+        if (steering.mode == SteeringMode.persuit && collision.transform.CompareTag("Player"))
         {
             EndGame();
         }

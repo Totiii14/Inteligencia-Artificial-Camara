@@ -1922,7 +1922,7 @@ PrefabInstance:
     m_AddedComponents:
     - targetCorrespondingSourceObject: {fileID: -516098083770646512, guid: 9bb2f18993505e54f8bf92fd2b4b50a8, type: 3}
       insertIndex: -1
-      addedObject: {fileID: 477458290}
+      addedObject: {fileID: 477458294}
     - targetCorrespondingSourceObject: {fileID: 8416272007918961125, guid: 9bb2f18993505e54f8bf92fd2b4b50a8, type: 3}
       insertIndex: -1
       addedObject: {fileID: 60304925}
@@ -2174,8 +2174,8 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: -516098083770646512, guid: 9bb2f18993505e54f8bf92fd2b4b50a8, type: 3}
   m_PrefabInstance: {fileID: 436650800}
   m_PrefabAsset: {fileID: 0}
---- !u!65 &477458290
-BoxCollider:
+--- !u!64 &477458294
+MeshCollider:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
@@ -2192,9 +2192,10 @@ BoxCollider:
   m_IsTrigger: 0
   m_ProvidesContacts: 0
   m_Enabled: 1
-  serializedVersion: 3
-  m_Size: {x: 5.0482836, y: 9.160929, z: 4.5462465}
-  m_Center: {x: -2.3887625, y: 4.5804696, z: -1.2448282}
+  serializedVersion: 5
+  m_Convex: 1
+  m_CookingOptions: 30
+  m_Mesh: {fileID: 4493585093827132993, guid: 9bb2f18993505e54f8bf92fd2b4b50a8, type: 3}
 --- !u!1 &484491757
 GameObject:
   m_ObjectHideFlags: 0
@@ -2729,7 +2730,7 @@ SphereCollider:
     serializedVersion: 2
     m_Bits: 0
   m_LayerOverridePriority: 0
-  m_IsTrigger: 0
+  m_IsTrigger: 1
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
@@ -2820,7 +2821,6 @@ GameObject:
   - component: {fileID: 572894512}
   - component: {fileID: 572894511}
   - component: {fileID: 572894518}
-  - component: {fileID: 572894519}
   m_Layer: 7
   m_Name: Enemy 1
   m_TagString: Untagged
@@ -2895,7 +2895,7 @@ MonoBehaviour:
   obstacleMask:
     serializedVersion: 2
     m_Bits: 8
-  rayDistance: 1.5
+  rayDistance: 3
   avoidForce: 10
   frontRayOffset: 0.5
 --- !u!114 &572894513
@@ -3036,28 +3036,6 @@ MonoBehaviour:
   <IsPause>k__BackingField: 0
   <IsPatrolPause>k__BackingField: 0
   isBack: 0
---- !u!114 &572894519
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 572894508}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c8dfef4c26db0fa468d4a4d262129a9a, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _maxSpeed: 3
-  _maxForce: 5
-  separationRadius: 1.5
-  viewRadius: 5
-  separationWheight: 2.17
-  cohesionWheight: 0.719
-  alignmentWheight: 0.457
-  boids:
-    serializedVersion: 2
-    m_Bits: 128
 --- !u!1 &579408626 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 7333631254909853010, guid: 9bb2f18993505e54f8bf92fd2b4b50a8, type: 3}
@@ -5178,7 +5156,7 @@ SphereCollider:
     serializedVersion: 2
     m_Bits: 0
   m_LayerOverridePriority: 0
-  m_IsTrigger: 0
+  m_IsTrigger: 1
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
@@ -7380,7 +7358,7 @@ SphereCollider:
     serializedVersion: 2
     m_Bits: 0
   m_LayerOverridePriority: 0
-  m_IsTrigger: 0
+  m_IsTrigger: 1
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
@@ -7637,7 +7615,7 @@ MonoBehaviour:
   obstacleMask:
     serializedVersion: 2
     m_Bits: 8
-  rayDistance: 1.5
+  rayDistance: 3
   avoidForce: 10
   frontRayOffset: 0.5
 --- !u!114 &1544491665
@@ -7785,7 +7763,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1544491659}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: c8dfef4c26db0fa468d4a4d262129a9a, type: 3}
   m_Name: 
@@ -9662,7 +9640,7 @@ MonoBehaviour:
   obstacleMask:
     serializedVersion: 2
     m_Bits: 8
-  rayDistance: 1.5
+  rayDistance: 3
   avoidForce: 10
   frontRayOffset: 0.5
 --- !u!114 &2025694365
@@ -9790,17 +9768,17 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2025694359}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: c8dfef4c26db0fa468d4a4d262129a9a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _maxSpeed: 5
+  _maxSpeed: 3
   _maxForce: 5
   separationRadius: 1.5
   viewRadius: 5
   separationWheight: 2.17
-  cohesionWheight: 0.23
+  cohesionWheight: 0.719
   alignmentWheight: 0.457
   boids:
     serializedVersion: 2

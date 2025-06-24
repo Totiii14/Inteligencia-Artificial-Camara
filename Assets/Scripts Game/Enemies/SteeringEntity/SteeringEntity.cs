@@ -93,7 +93,7 @@ public class SteeringEntity : MonoBehaviour
                 if (avoidDir != Vector3.zero)
                     steeringVelocity = avoidDir;
                 else
-                    steeringVelocity = Vector3.zero; 
+                    steeringVelocity = Vector3.zero;
             }
 
             rb.AddForce(steeringVelocity, ForceMode.Acceleration);
@@ -129,6 +129,9 @@ public class SteeringEntity : MonoBehaviour
 
         if (!IsChasing)
         {
+            if (TryGetComponent(out Boid boid))
+                boid.enabled = false;
+
             enemyPatrol.IsPause = false;
             enemyPatrol.IsPatrolPause = false;
             enemyPatrol.Patrol();

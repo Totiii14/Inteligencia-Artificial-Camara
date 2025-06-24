@@ -1,5 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class SteeringBase : MonoBehaviour
@@ -22,4 +20,12 @@ public class SteeringBase : MonoBehaviour
     }
 
     protected void AddForce(Vector3 force) => _velocity = Vector3.ClampMagnitude(_velocity + force, _maxSpeed);
+
+    protected void Move()
+    {
+        if(_velocity == Vector3.zero) return;
+
+        transform.forward = _velocity;
+        transform.position += _velocity * Time.deltaTime;
+    }
 }

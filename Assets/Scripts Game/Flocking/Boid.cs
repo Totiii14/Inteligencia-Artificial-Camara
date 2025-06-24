@@ -12,6 +12,7 @@ public class Boid : SteeringBase
     [SerializeField, Range(0, 1f)] float cohesionWheight;
     [SerializeField, Range(0, 1f)] float alignmentWheight;
     [SerializeField] LayerMask boids;
+    
     void Start()
     {
         Vector3 dir = new Vector3(Random.Range(-1, 1), 0, Random.Range(-1, 1));
@@ -21,10 +22,11 @@ public class Boid : SteeringBase
     void Update()
     {
         Flocking();
+        Move();
     }
+
     private void Flocking()
     {
-        //Combino los behaviours
         Vector3 flockingForce = Separation() * separationWheight + 
             Cohesion() * cohesionWheight + 
             Alignment() * alignmentWheight;

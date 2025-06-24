@@ -13,7 +13,6 @@ public class ObstacleAvoid : MonoBehaviour
     private Vector3 avoidanceDirection = Vector3.zero;
     private float avoidCooldown = 0f;
 
-
     private void Update()
     {
 
@@ -21,7 +20,7 @@ public class ObstacleAvoid : MonoBehaviour
         if (avoidCooldown <= 0f)
         {
             CheckForObstacles();
-            avoidCooldown = 0.1f; // 10 veces por segundo
+            avoidCooldown = 0.1f; 
         }
     }
 
@@ -48,13 +47,12 @@ public class ObstacleAvoid : MonoBehaviour
             if (Physics.Raycast(origin, dir, out RaycastHit hit, rayDistance, obstacleMask))
             {
                 IsObstacle = true;
-                avoidanceDirection += -dir * (1f - hit.distance / rayDistance); // más cerca, más fuerza
+                avoidanceDirection += -dir * (1f - hit.distance / rayDistance);
             }
         }
 
         if (IsObstacle && avoidanceDirection != Vector3.zero)
         {
-            // Suaviza la dirección de evasión con Lerp para evitar oscilaciones bruscas
             avoidanceDirection = Vector3.Lerp(transform.forward, avoidanceDirection.normalized, 0.5f);
         }
 

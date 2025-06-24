@@ -21,7 +21,7 @@ public class RandomEvent : MonoBehaviour
         weightInvis = 0.5f;
     }
 
-    private void OnCollisionEnter(Collision other)
+    private void OnTriggerEnter(Collider other)
     {
         if (other.gameObject.CompareTag("Player"))
         {
@@ -38,10 +38,10 @@ public class RandomEvent : MonoBehaviour
                 StartCoroutine(BecomeInvisibleTemporarily());
                 AdjustWeights(isInvisibility: true);
             }
-        }
-        Debug.Log($"[Weights] Notify: {weightNotify:F2} | Invisibility: {weightInvis:F2}");
+            Debug.Log($"[Weights] Notify: {weightNotify:F2} | Invisibility: {weightInvis:F2}");
 
-        GetComponent<Collider>().enabled = false;
+            GetComponent<Collider>().enabled = false;
+        }
     }
 
     private IEnumerator NotifyEnemies(Vector3 playerPosition)
@@ -60,7 +60,7 @@ public class RandomEvent : MonoBehaviour
         if (playerDetection != null)
             playerDetection.SetDetectable(false);
 
-        textInivisibility.gameObject.SetActive(true); 
+        textInivisibility.gameObject.SetActive(true);
 
         yield return new WaitForSeconds(invisibilityDuration);
 
