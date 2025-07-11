@@ -20,7 +20,7 @@ public class EnemyManager : MonoBehaviour
     {
         if (steering.mode == SteeringMode.evade)
         {
-            NotifyFriends(steering.Target.position);
+            //NotifyFriends(steering.Target.position);
         }
     }
 
@@ -35,7 +35,6 @@ public class EnemyManager : MonoBehaviour
 
             if (friend.mode == SteeringMode.persuit)
             {
-                friend.enemyPatrol.IsPause = true;
                 friend.GoToLastSeenPosition(playerLastPosition);
 
                 Vector3 dirToTarget = (playerLastPosition - friend.transform.position).normalized;

@@ -1,10 +1,14 @@
-using static PlayerStatesEnum;
+using System.Transactions;
+using UnityEngine;
+using static SoldierStatesEnum;
 
-public class FSM 
+public class FSMIASoldiers 
 {
     private State _currentState;
 
-    public FSM() { }
+    public Transform Target { get; set; }
+
+    public FSMIASoldiers() { }
 
     public void SetInit(State init)
     {
@@ -17,7 +21,7 @@ public class FSM
         _currentState.Execute();
     }
 
-    public void Transition(PlayerStates input)
+    public void Transition(SoldiersIAStates input)
     {
         State newState = _currentState.GetTransition(input);
         if (newState == null) return;

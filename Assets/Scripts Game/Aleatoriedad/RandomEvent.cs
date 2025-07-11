@@ -6,7 +6,6 @@ public class RandomEvent : MonoBehaviour
 {
     [SerializeField] private float invisibilityDuration = 4f;
     [SerializeField] private EnemyManager enemyManager;
-    [SerializeField] private PlayerDetection playerDetection;
 
     [SerializeField] private TMP_Text textInivisibility;
     [SerializeField] private TMP_Text textDetected;
@@ -57,15 +56,12 @@ public class RandomEvent : MonoBehaviour
 
     private IEnumerator BecomeInvisibleTemporarily()
     {
-        if (playerDetection != null)
-            playerDetection.SetDetectable(false);
 
         textInivisibility.gameObject.SetActive(true);
 
         yield return new WaitForSeconds(invisibilityDuration);
 
         Destroy(gameObject);
-        playerDetection.SetDetectable(true);
         textInivisibility.gameObject.SetActive(false);
     }
 

@@ -15,14 +15,11 @@ public class SteeringEntity : MonoBehaviour
     public Rigidbody rb { get; set; }
     private ObstacleAvoid obstacleAvoid;
     private LineOfSight lineOfSight;
-    public EnemyPatrol enemyPatrol { get; private set; }
     private EnemyManager enemyManager;
 
     private bool IsChasing = false;
     public bool IsOnView { get; private set; }
     public Vector3 SteeringVelocity { get => steeringVelocity; set => steeringVelocity = value; }
-
-    private Coroutine backToPatrolCoroutine;
 
     public enum SteeringMode
     {
@@ -37,7 +34,6 @@ public class SteeringEntity : MonoBehaviour
         obstacleAvoid = GetComponent<ObstacleAvoid>();
         rb = GetComponent<Rigidbody>();
         lineOfSight = GetComponent<LineOfSight>();
-        enemyPatrol = GetComponentInParent<EnemyPatrol>();
         enemyManager = GetComponent<EnemyManager>();
     }
 
@@ -60,28 +56,10 @@ public class SteeringEntity : MonoBehaviour
     {
         IsOnView = targetRb && lineOfSight.CheckDistance(Target) && lineOfSight.CheckAngle(Target) && lineOfSight.CheckView(Target);
 
-        if (IsOnView || (currentSteering is Persuit p && p.IsOverridingTarget))
+        if (IsOnView)
         {
-            if (backToPatrolCoroutine != null)
-            {
-                StopCoroutine(backToPatrolCoroutine);
-                backToPatrolCoroutine = null;
-            }
-
             IsChasing = true;
-            enemyPatrol.IsPause = true;
-            enemyPatrol.IsPatrolPause = false;
             enemyManager.EnemyAlarm();
-
-            if (currentSteering is Persuit persuitSteering && persuitSteering.IsOverridingTarget)
-            {
-                if (Vector3.Distance(transform.position, persuitSteering.TargetPosition) < 1.5f)
-                {
-                    persuitSteering.ResetTarget();
-                    if (backToPatrolCoroutine == null)
-                        backToPatrolCoroutine = StartCoroutine(BackToPatrol());
-                }
-            }
 
             if (!obstacleAvoid.IsObstacle)
             {
@@ -107,37 +85,7 @@ public class SteeringEntity : MonoBehaviour
         else
         {
             IsChasing = false;
-            if (enemyPatrol.IsPause)
-            {
-                if (backToPatrolCoroutine == null)
-                    backToPatrolCoroutine = StartCoroutine(BackToPatrol());
-            }
-            else
-            {
-                enemyPatrol.IsPause = false;
-                enemyPatrol.IsPatrolPause = false;
-                enemyPatrol.Patrol();
-            }
         }
-    }
-
-    private IEnumerator BackToPatrol()
-    {
-        rb.velocity = Vector3.zero;
-        rb.angularVelocity = Vector3.zero;
-        yield return new WaitForSeconds(3f);
-
-        if (!IsChasing)
-        {
-            if (TryGetComponent(out Boid boid))
-                boid.enabled = false;
-
-            enemyPatrol.IsPause = false;
-            enemyPatrol.IsPatrolPause = false;
-            enemyPatrol.Patrol();
-        }
-
-        backToPatrolCoroutine = null;
     }
 
     public void GoToLastSeenPosition(Vector3 lastPosition)
