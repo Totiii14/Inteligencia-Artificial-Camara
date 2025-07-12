@@ -1,6 +1,6 @@
 using UnityEngine;
+using static SoldierStatesEnum;
 using static SteeringEntity;
-using static UnityEngine.GraphicsBuffer;
 
 public class SoldierStateChasing : State
 {
@@ -8,16 +8,18 @@ public class SoldierStateChasing : State
     private ObstacleAvoid _obstacleAvoid;
     private Rigidbody _rb;
     private Transform _transform;
+    private LineOfSight _los;
     private float _maxVelocity;
     private float _timePrediction;
 
-    public SoldierStateChasing(FSMIASoldiers fsm, SteeringEntity steering, Rigidbody rb, ObstacleAvoid obstacleAvoid, Transform transform, float maxVelocity, float timePrediction)
+    public SoldierStateChasing(FSMIASoldiers fsm, SteeringEntity steering, Rigidbody rb, ObstacleAvoid obstacleAvoid, Transform transform, LineOfSight los, float maxVelocity, float timePrediction)
     {
         _fsm = fsm;
         _steering = steering;
         _obstacleAvoid = obstacleAvoid;
         _rb = rb;
         _transform = transform;
+        _los = los;
         _maxVelocity = maxVelocity;
         _timePrediction = timePrediction;
     }
@@ -30,6 +32,21 @@ public class SoldierStateChasing : State
     public override void Execute()
     {
         if (_fsm.Target == null) return;
+
+        if (!_los.CheckDistance(_fsm.Target) ||
+            !_los.CheckAngle(_fsm.Target) ||
+            !_los.CheckView(_fsm.Target))
+        {
+            _fsm.Transition(SoldiersIAStates.SearchingEnemy);
+            return;
+        }
+
+        if (_fsm.lives <= 3 && !_fsm.hasEscaped)
+        {
+            _fsm.hasEscaped = true;
+            _fsm.Transition(SoldiersIAStates.Evading);
+            return;
+        }
 
         if (!_obstacleAvoid.IsObstacle)
         {
@@ -47,7 +64,28 @@ public class SoldierStateChasing : State
                 _steering.SteeringVelocity = Vector3.zero;
         }
 
-        _rb.AddForce(_steering.SteeringVelocity, ForceMode.Acceleration);
+        if ((_rb.position - _fsm.Target.position).sqrMagnitude < 2f)
+        {
+            _rb.velocity = Vector3.zero;
+
+            float hitChance = 0.7f;
+            if (Random.value < hitChance)
+            {
+                IAFSM enemyIA = _fsm.Target.GetComponent<IAFSM>();
+                if (enemyIA != null)
+                {
+                    enemyIA.ReceiveHit();
+                }
+            }
+            else
+            {
+                Debug.Log($"{_rb.name} falló el ataque.");
+            }
+        }
+        else
+        {
+            _rb.AddForce(_steering.SteeringVelocity, ForceMode.Acceleration);
+        }
 
         if (_steering.SteeringVelocity.sqrMagnitude > 0.01f)
         {
@@ -56,3 +94,4 @@ public class SoldierStateChasing : State
         }
     }
 }
+

@@ -1,13 +1,10 @@
 using UnityEngine;
+using UnityEngine.Playables;
 using static SoldierStatesEnum;
 
 public class IAFSM : MonoBehaviour
 {
     [Header("Movement Settings")]
-    public float walkSpeed = 4f;
-    public float sprintSpeed = 6f;
-    public float groundDrag = 5f;
-    public float playerHeight = 2f;
     public string enemyTag;
 
     [SerializeField] float maxVelocity;
@@ -38,7 +35,7 @@ public class IAFSM : MonoBehaviour
 
         
         SoldierStateSearching searching = new SoldierStateSearching(fsm, boid, rb, los, enemyTag);
-        SoldierStateChasing chasing = new SoldierStateChasing(fsm, steering, rb, obstacleAvoid, transform, maxVelocity, timePrediction);
+        SoldierStateChasing chasing = new SoldierStateChasing(fsm, steering, rb, obstacleAvoid, transform, los, maxVelocity, timePrediction);
         SoldierStateEvading evading = new SoldierStateEvading(fsm, steering, rb, obstacleAvoid, transform, maxVelocity, timePrediction);
 
         searching.AddTransition(SoldiersIAStates.Chasing, chasing);
@@ -58,5 +55,41 @@ public class IAFSM : MonoBehaviour
     private void Update()
     {
         fsm.Update();
+    }
+
+    public void ReceiveHit()
+    {
+        fsm.lives--;
+        if (fsm.lives <= 0)
+        {
+            NotifyFollowers();
+
+            Destroy(gameObject);
+        }
+    }
+
+    private void NotifyFollowers()
+    {
+        IAFSM[] allSoldiers = FindObjectsOfType<IAFSM>();
+        foreach (var soldier in allSoldiers)
+        {
+            if (soldier == this) continue;
+
+            if (soldier.GetTarget() == transform)
+            {
+                soldier.ClearTarget();
+            }
+        }
+    }
+
+    public Transform GetTarget()
+    {
+        return fsm.Target;
+    }
+
+    public void ClearTarget()
+    {
+        fsm.Target = null;
+        fsm.Transition(SoldiersIAStates.SearchingEnemy);
     }
 }

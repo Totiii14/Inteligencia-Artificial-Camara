@@ -49,13 +49,16 @@ public class EnemyManager : MonoBehaviour
         }
     }
 
-    private void OnCollisionEnter(Collision collision)
-    {
-        if (steering.mode == SteeringMode.persuit && collision.transform.CompareTag("Player"))
-        {
-            EndGame();
-        }
-    }
+    //private void OnCollisionEnter(Collision collision)
+    //{
+    //    if (steering.mode == SteeringMode.persuit && collision.transform.CompareTag(iaFSM.enemyTag))
+    //    {
+    //        iaFSM.lives--;
+
+    //        if (iaFSM.lives < 1)
+    //            EndGame();
+    //    }
+    //}
 
     private void EndGame()
     {

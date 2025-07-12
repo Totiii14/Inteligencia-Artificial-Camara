@@ -7,8 +7,11 @@ public class FSMIASoldiers
     private State _currentState;
 
     public Transform Target { get; set; }
+    public int lives = 10;
 
-    public FSMIASoldiers() { }
+    public bool hasEscaped = false; 
+
+    public FSMIASoldiers() {}
 
     public void SetInit(State init)
     {

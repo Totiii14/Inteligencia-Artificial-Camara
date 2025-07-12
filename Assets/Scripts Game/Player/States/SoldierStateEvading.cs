@@ -1,4 +1,5 @@
 using UnityEngine;
+using static SoldierStatesEnum;
 using static SteeringEntity;
 
 public class SoldierStateEvading : State
@@ -9,6 +10,9 @@ public class SoldierStateEvading : State
     private Transform _transform;
     private float _maxVelocity;
     private float _timePrediction;
+
+    private float evadeDuration = 3f;
+    private float evadeTimer = 0f;
 
     public SoldierStateEvading(FSMIASoldiers fsm, SteeringEntity steering, Rigidbody rb, ObstacleAvoid obstacleAvoid, Transform transform, float maxVelocity, float timePrediction)
     {
@@ -24,6 +28,7 @@ public class SoldierStateEvading : State
     public override void Awake()
     {
         _steering.mode = SteeringMode.evade;
+        evadeTimer = 0f;
     }
 
     public override void Execute()
@@ -52,6 +57,13 @@ public class SoldierStateEvading : State
         {
             Quaternion targetRotation = Quaternion.LookRotation(_steering.SteeringVelocity.normalized);
             _transform.rotation = Quaternion.Slerp(_transform.rotation, targetRotation, Time.deltaTime * 5f);
+        }
+
+        evadeTimer += Time.deltaTime;
+        if (evadeTimer >= evadeDuration)
+        {
+            _fsm.Transition(SoldiersIAStates.SearchingEnemy);
+            return;
         }
     }
 }

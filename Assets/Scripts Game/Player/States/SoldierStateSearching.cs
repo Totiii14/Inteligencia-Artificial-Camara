@@ -24,7 +24,7 @@ public class SoldierStateSearching : State
 
     public override void Awake()
     {
-        Debug.Log("Entrando en estado SEARCHING");
+        _boid.enabled = true;
     }
 
     public override void Execute()
@@ -48,13 +48,10 @@ public class SoldierStateSearching : State
                 return;
             }
         }
-
-        if (!_boid.enabled)
-            _boid.enabled = true;
     }
 
     public override void Sleep()
     {
-        Debug.Log("Saliendo de estado SEARCHING");
+        _boid.enabled = false;
     }
 }
