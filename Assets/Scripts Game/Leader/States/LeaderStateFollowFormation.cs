@@ -25,17 +25,20 @@ public class LeaderStateFormation : LeaderState
         _boid.isLeader = true;
         pathIndex = 0;
 
-        Node startNode = _starManager.GetClosestNode(_leader.transform.position);
-        Node endNode = _starManager.GetClosestNode(_leader.EnemyLeaderTarget.position);
-
-        if (startNode != null && endNode != null)
+        if (_leader.EnemyLeaderTarget != null)
         {
-            currentPath = _starManager.GeneratePath(startNode, endNode);
-        }
+            Node startNode = _starManager.GetClosestNode(_leader.transform.position);
+            Node endNode = _starManager.GetClosestNode(_leader.EnemyLeaderTarget.position);
 
-        for (int i = 0; i < currentPath.Count - 1; i++)
-        {
-            Debug.DrawLine(currentPath[i].transform.position, currentPath[i + 1].transform.position, Color.green);
+            if (startNode != null && endNode != null)
+            {
+                currentPath = _starManager.GeneratePath(startNode, endNode);
+            }
+
+            for (int i = 0; i < currentPath.Count - 1; i++)
+            {
+                Debug.DrawLine(currentPath[i].transform.position, currentPath[i + 1].transform.position, Color.red);
+            }
         }
 
         Debug.Log("Leader: Formation state - moving towards enemy leader");
@@ -46,12 +49,14 @@ public class LeaderStateFormation : LeaderState
         if (_leader.CanSeeEnemy())
         {
             _fsm.Transition(LeaderStateType.Attack);
+            currentPath.Clear();
             return;
         }
 
         if (_leader.ShouldEvade())
         {
             _fsm.Transition(LeaderStateType.Evade);
+            currentPath.Clear();
             return;
         }
 

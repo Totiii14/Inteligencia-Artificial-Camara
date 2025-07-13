@@ -1217,6 +1217,8 @@ GameObject:
   - component: {fileID: 198227025}
   - component: {fileID: 198227032}
   - component: {fileID: 198227031}
+  - component: {fileID: 198227033}
+  - component: {fileID: 198227034}
   m_Layer: 8
   m_Name: LeaderB
   m_TagString: EnemyB
@@ -1243,10 +1245,13 @@ MonoBehaviour:
   regroupDuration: 5
   enemyLeaderTarget: {fileID: 1374631741}
   aStarManager: {fileID: 1823541645}
+  timePrediction: 0.1
+  maxVelocity: 10
   myTroop:
   - {fileID: 572894519}
   - {fileID: 1544491672}
   - {fileID: 2025694371}
+  Target: {fileID: 0}
 --- !u!54 &198227026
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -1357,7 +1362,7 @@ Transform:
   m_GameObject: {fileID: 198227024}
   serializedVersion: 2
   m_LocalRotation: {x: 0.0014932988, y: -0.7071052, z: 0.00096260745, w: 0.7071062}
-  m_LocalPosition: {x: 2.01, y: 64.51, z: 84.73}
+  m_LocalPosition: {x: 22.47, y: 64.58, z: 84.73}
   m_LocalScale: {x: 0.9953201, y: 0.9953196, z: 0.9953201}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -1407,6 +1412,41 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 0
   isLeader: 0
+--- !u!114 &198227033
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 198227024}
+  m_Enabled: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6e3393d040c859647bbc2fb6b408df72, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  <Target>k__BackingField: {fileID: 0}
+  targetRb: {fileID: 0}
+  maxVelocity: 10
+  timePrediction: 0.2
+  mode: 0
+--- !u!114 &198227034
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 198227024}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f8acb2a41fe41f849baad544ebad86d7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  obstacleMask:
+    serializedVersion: 2
+    m_Bits: 8
+  rayDistance: 2
+  avoidForce: 10
+  frontRayOffset: 0.5
 --- !u!1 &204331412
 GameObject:
   m_ObjectHideFlags: 0
@@ -4795,6 +4835,8 @@ GameObject:
   - component: {fileID: 1374631736}
   - component: {fileID: 1374631742}
   - component: {fileID: 1374631743}
+  - component: {fileID: 1374631744}
+  - component: {fileID: 1374631745}
   m_Layer: 7
   m_Name: Leader A
   m_TagString: EnemyA
@@ -4821,8 +4863,11 @@ MonoBehaviour:
   regroupDuration: 5
   enemyLeaderTarget: {fileID: 198227030}
   aStarManager: {fileID: 1823541645}
+  timePrediction: 0.1
+  maxVelocity: 10
   myTroop:
   - {fileID: 1708222478}
+  Target: {fileID: 0}
 --- !u!54 &1374631737
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -4933,7 +4978,7 @@ Transform:
   m_GameObject: {fileID: 1374631735}
   serializedVersion: 2
   m_LocalRotation: {x: 0.0012588042, y: -0.7071057, z: -0.0012588042, w: -0.7071057}
-  m_LocalPosition: {x: -12.48, y: 64.46, z: 84.73}
+  m_LocalPosition: {x: -22.45, y: 64.43, z: 84.73}
   m_LocalScale: {x: 0.9953201, y: 0.9953196, z: 0.9953201}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -4983,6 +5028,41 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 0
   isLeader: 0
+--- !u!114 &1374631744
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1374631735}
+  m_Enabled: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6e3393d040c859647bbc2fb6b408df72, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  <Target>k__BackingField: {fileID: 0}
+  targetRb: {fileID: 0}
+  maxVelocity: 10
+  timePrediction: 0.2
+  mode: 0
+--- !u!114 &1374631745
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1374631735}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f8acb2a41fe41f849baad544ebad86d7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  obstacleMask:
+    serializedVersion: 2
+    m_Bits: 8
+  rayDistance: 2
+  avoidForce: 10
+  frontRayOffset: 0.5
 --- !u!1 &1377741746
 GameObject:
   m_ObjectHideFlags: 0
@@ -6729,7 +6809,7 @@ Transform:
   m_GameObject: {fileID: 1704319901}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -3.87, y: 64.46, z: 84.41}
+  m_LocalPosition: {x: -3.87, y: 64.28, z: 84.41}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:

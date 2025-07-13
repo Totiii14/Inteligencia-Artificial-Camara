@@ -1,6 +1,7 @@
 using UnityEngine;
 using static SoldierStatesEnum;
 using static SteeringEntity;
+using static UnityEngine.GraphicsBuffer;
 
 public class SoldierStateChasing : State
 {
@@ -71,10 +72,15 @@ public class SoldierStateChasing : State
             float hitChance = 0.7f;
             if (Random.value < hitChance)
             {
-                IAFSM enemyIA = _fsm.Target.GetComponent<IAFSM>();
-                if (enemyIA != null)
+                if (_fsm.Target.TryGetComponent<IAFSM>(out IAFSM iAFSM))
                 {
-                    enemyIA.ReceiveHit();
+                    iAFSM.ReceiveHit();
+                    Debug.Log("Leader golpeó al enemigo");
+                }
+                else if (_fsm.Target.TryGetComponent<LeaderFSM>(out LeaderFSM leaderFSM))
+                {
+                    leaderFSM.ReceiveHit();
+                    Debug.Log("Leader golpeó al líder");
                 }
             }
             else

@@ -1,7 +1,16 @@
 
+using UnityEngine;
+
 public class FSMLeaderStates 
 {
     private LeaderState _currentState;
+
+    public Transform Target { get; set; }
+    public int lives = 10;
+
+    public bool hasEscaped = false;
+
+    public bool IsEvading { get; private set; }
 
     public void SetInit(LeaderState state)
     {
@@ -21,6 +30,11 @@ public class FSMLeaderStates
         _currentState.Sleep();
         _currentState = newState;
         _currentState.Awake();
+    }
+
+    public void SetEvading(bool value)
+    {
+        IsEvading = value;
     }
 }
 
