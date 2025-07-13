@@ -59,6 +59,8 @@ public class IAFSM : MonoBehaviour
 
     public void ReceiveHit()
     {
+        if (fsm.IsEvading) return;
+
         fsm.lives--;
         if (fsm.lives <= 0)
         {
@@ -71,7 +73,7 @@ public class IAFSM : MonoBehaviour
     private void NotifyFollowers()
     {
         IAFSM[] allSoldiers = FindObjectsOfType<IAFSM>();
-        foreach (var soldier in allSoldiers)
+        foreach (IAFSM soldier in allSoldiers)
         {
             if (soldier == this) continue;
 

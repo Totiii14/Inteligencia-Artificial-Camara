@@ -48,6 +48,13 @@ public class SoldierStateSearching : State
                 return;
             }
         }
+
+        if (_fsm.lives <= 3 && !_fsm.hasEscaped)
+        {
+            _fsm.hasEscaped = true;
+            _fsm.Transition(SoldiersIAStates.Evading);
+            return;
+        }
     }
 
     public override void Sleep()

@@ -27,8 +27,11 @@ public class SoldierStateEvading : State
 
     public override void Awake()
     {
+
+        Debug.Log("Evade");
         _steering.mode = SteeringMode.evade;
         evadeTimer = 0f;
+        _fsm.SetEvading(true); 
     }
 
     public override void Execute()
@@ -62,6 +65,7 @@ public class SoldierStateEvading : State
         evadeTimer += Time.deltaTime;
         if (evadeTimer >= evadeDuration)
         {
+            _fsm.SetEvading(false);
             _fsm.Transition(SoldiersIAStates.SearchingEnemy);
             return;
         }
