@@ -34,6 +34,7 @@ public class LeaderStateEvade : LeaderState
         Debug.Log("Leader: Evading...");
         _fsm.SetEvading(true);
         evadeTimer = 0f;
+        _maxVelocity = 10f;
 
         _steering.mode = SteeringMode.evade;
 

@@ -13,8 +13,12 @@ public class LeaderStateHeal : LeaderState
     public override void Awake()
     {
         Debug.Log("Leader: Healing...");
-        timer = 2f;
-        _leader.HealTroop();
+        timer = 5f;
+        int healsToPerform = 3;
+        for (int i = 0; i < healsToPerform; i++)
+        {
+            _leader.HealTroop();
+        }
     }
 
     public override void Execute()

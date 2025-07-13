@@ -30,6 +30,7 @@ public class SoldierStateEvading : State
 
         Debug.Log("Evade");
         _steering.mode = SteeringMode.evade;
+        _maxVelocity = 10f;
         evadeTimer = 0f;
         _fsm.SetEvading(true); 
     }

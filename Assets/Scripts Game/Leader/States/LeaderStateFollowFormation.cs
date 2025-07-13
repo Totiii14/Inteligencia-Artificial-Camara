@@ -9,6 +9,8 @@ public class LeaderStateFormation : LeaderState
     private List<Node> currentPath;
     private int pathIndex = 0;
     private float reachedNodeThreshold = 0.5f;
+    private float searchTimeout = 8f; // Tiempo máximo de búsqueda
+    private float searchTimer = 0f;
 
     public LeaderStateFormation(FSMLeaderStates fsm, LeaderFSM leader, Boid boid, AStarManager aStar)
     {
@@ -24,6 +26,7 @@ public class LeaderStateFormation : LeaderState
         _boid.enabled = true;
         _boid.isLeader = true;
         pathIndex = 0;
+        searchTimer = 0f;
 
         if (_leader.EnemyLeaderTarget != null)
         {
@@ -46,6 +49,8 @@ public class LeaderStateFormation : LeaderState
 
     public override void Execute()
     {
+        searchTimer += Time.deltaTime;
+
         if (_leader.CanSeeEnemy())
         {
             _fsm.Transition(LeaderStateType.Attack);
@@ -58,6 +63,24 @@ public class LeaderStateFormation : LeaderState
             _fsm.Transition(LeaderStateType.Evade);
             currentPath.Clear();
             return;
+        }
+
+        if (searchTimer >= searchTimeout)
+        {
+            Transform randomEnemy = GetAnyEnemy();
+            if (randomEnemy != null)
+            {
+                Debug.Log("No se encontró enemigo visible, yendo hacia un enemigo random: " + randomEnemy.name);
+                Node startNode = _starManager.GetClosestNode(_leader.transform.position);
+                Node endNode = _starManager.GetClosestNode(randomEnemy.position);
+
+                if (startNode != null && endNode != null)
+                {
+                    currentPath = _starManager.GeneratePath(startNode, endNode);
+                    pathIndex = 0;
+                    searchTimer = 0f; // Reiniciar el tiempo
+                }
+            }
         }
 
         if (currentPath == null || currentPath.Count == 0) return;
@@ -78,5 +101,14 @@ public class LeaderStateFormation : LeaderState
         }
 
         _boid.Move();
+    }
+
+    private Transform GetAnyEnemy()
+    {
+        Collider[] colliders = Physics.OverlapSphere(_leader.transform.position, 100f, _leader.enemyMask);
+        if (colliders.Length == 0) return null;
+
+        int index = Random.Range(0, colliders.Length);
+        return colliders[index].transform;
     }
 }

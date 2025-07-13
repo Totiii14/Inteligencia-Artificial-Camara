@@ -28,11 +28,16 @@ public class SoldierStateChasing : State
     public override void Awake()
     {
         _steering.mode = SteeringMode.persuit;
+        _maxVelocity = 4f;
     }
 
     public override void Execute()
     {
-        if (_fsm.Target == null) return;
+        if (_fsm.Target == null)
+        {
+            _fsm.Transition(SoldiersIAStates.SearchingEnemy);
+            return;
+        }
 
         if (!_los.CheckDistance(_fsm.Target) ||
             !_los.CheckAngle(_fsm.Target) ||
@@ -75,12 +80,10 @@ public class SoldierStateChasing : State
                 if (_fsm.Target.TryGetComponent<IAFSM>(out IAFSM iAFSM))
                 {
                     iAFSM.ReceiveHit();
-                    Debug.Log("Leader golpeó al enemigo");
                 }
                 else if (_fsm.Target.TryGetComponent<LeaderFSM>(out LeaderFSM leaderFSM))
                 {
                     leaderFSM.ReceiveHit();
-                    Debug.Log("Leader golpeó al líder");
                 }
             }
             else

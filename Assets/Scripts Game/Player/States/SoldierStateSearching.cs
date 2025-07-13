@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 using static SoldierStatesEnum;
 
@@ -10,14 +12,22 @@ public class SoldierStateSearching : State
     private LineOfSight lineOfSight;
     private float detectionRadius = 10f;
     private string enemyTag;
+    private float searchTimer = 0f;
+    private float searchTimeout = 8f;
+
+    private List<Node> pathToEnemy = new();
+    private int pathIndex = 0;
+
+    private AStarManager _aStar;
 
     private Transform currentTarget;
 
-    public SoldierStateSearching(FSMIASoldiers fsm, Boid boid, Rigidbody rb, LineOfSight los, string enemyTag)
+    public SoldierStateSearching(FSMIASoldiers fsm, Boid boid, AStarManager aStar, Rigidbody rb, LineOfSight los, string enemyTag)
     {
         _fsm = fsm;
         _boid = boid;
         _rb = rb;
+        _aStar = aStar;
         this.lineOfSight = los;
         this.enemyTag = enemyTag;
     }
@@ -25,10 +35,15 @@ public class SoldierStateSearching : State
     public override void Awake()
     {
         _boid.enabled = true;
+        searchTimer = 0f;
+        pathIndex = 0;
+        pathToEnemy.Clear();
     }
 
     public override void Execute()
     {
+        searchTimer += Time.deltaTime;
+
         Collider[] colliders = Physics.OverlapSphere(_rb.position, detectionRadius);
 
         foreach (Collider col in colliders)
@@ -55,6 +70,44 @@ public class SoldierStateSearching : State
             _fsm.Transition(SoldiersIAStates.Evading);
             return;
         }
+
+        if (searchTimer >= searchTimeout && pathToEnemy.Count == 0)
+        {
+            Transform randomEnemy = GetRandomEnemy();
+
+            if (randomEnemy != null)
+            {
+                Node start = _aStar.GetClosestNode(_rb.position);
+                Node end = _aStar.GetClosestNode(randomEnemy.position);
+                if (start != null && end != null)
+                {
+                    pathToEnemy = _aStar.GeneratePath(start, end);
+                    pathIndex = 0;
+                    searchTimer = 0f;
+                }
+            }
+        }
+
+        if (pathToEnemy != null && pathToEnemy.Count > 0 && pathIndex < pathToEnemy.Count)
+        {
+            Node targetNode = pathToEnemy[pathIndex];
+            Vector3 dir = (targetNode.transform.position - _rb.position).normalized;
+            _boid.AddForce(dir * 10f); 
+            _boid.Move();
+
+            float dist = Vector3.Distance(_rb.position, targetNode.transform.position);
+            if (dist <= 0.5f)
+            {
+                pathIndex++;
+            }
+        }
+    }
+
+    private Transform GetRandomEnemy()
+    {
+        GameObject[] enemies = GameObject.FindGameObjectsWithTag(enemyTag);
+        if (enemies.Length == 0) return null;
+        return enemies[Random.Range(0, enemies.Length)].transform;
     }
 
     public override void Sleep()

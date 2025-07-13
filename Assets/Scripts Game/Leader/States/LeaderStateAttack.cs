@@ -1,20 +1,23 @@
 using UnityEngine;
+using static SteeringEntity;
 
 public class LeaderStateAttack : LeaderState
 {
     private Transform _target;
     private Rigidbody _rb;
     private LineOfSight _los;
+    private ObstacleAvoid _obstacleAvoid;
     private float _maxVelocity;
     private float _timePrediction;
     private SteeringEntity _steering;
 
-    public LeaderStateAttack(FSMLeaderStates fsm, LeaderFSM leader, Rigidbody rb, LineOfSight los, float maxVelocity, float timePrediction, SteeringEntity steering)
+    public LeaderStateAttack(FSMLeaderStates fsm, LeaderFSM leader, Rigidbody rb, LineOfSight los, ObstacleAvoid obstacleAvoid, float maxVelocity, float timePrediction, SteeringEntity steering)
     {
         _fsm = fsm;
         _leader = leader;
         _rb = rb;
         _los = los;
+        _obstacleAvoid = obstacleAvoid;
         _maxVelocity = maxVelocity;
         _timePrediction = timePrediction;
         _steering = steering;
@@ -24,6 +27,8 @@ public class LeaderStateAttack : LeaderState
     {
         _leader.SetFormationActive(false);
         _target = _leader.GetClosestVisibleEnemy();
+        _maxVelocity = 4f;
+        _steering.mode = SteeringMode.persuit;
         Debug.Log("Leader: Attack!");
     }
 
@@ -53,9 +58,20 @@ public class LeaderStateAttack : LeaderState
             return;
         }
 
-        Persuit persuit = new(_rb, _target.GetComponent<Rigidbody>(), _maxVelocity, _timePrediction);
-        _steering.currentSteering = persuit;
-        _steering.SteeringVelocity = _steering.currentSteering.MoveDirection();
+        if (!_obstacleAvoid.IsObstacle)
+        {
+            Persuit persuit = new(_rb, _target.GetComponent<Rigidbody>(), _maxVelocity, _timePrediction);
+            _steering.currentSteering = persuit;
+            _steering.SteeringVelocity = _steering.currentSteering.MoveDirection();
+        }
+        else
+        {
+            Vector3 avoidDir = _obstacleAvoid.GetAvoidDirection();
+            if (avoidDir != Vector3.zero)
+                _steering.SteeringVelocity = avoidDir;
+            else
+                _steering.SteeringVelocity = Vector3.zero;
+        }
 
         _rb.AddForce(_steering.SteeringVelocity, ForceMode.Acceleration);
 

@@ -7,7 +7,7 @@ public class LeaderFSM : MonoBehaviour
 {
     [Header("Leader Config")]
     [SerializeField] float detectionRadius = 15f;
-    [SerializeField] LayerMask enemyMask;
+    public LayerMask enemyMask;
     [SerializeField] float regroupDuration = 5f;
 
     [SerializeField] private Transform enemyLeaderTarget;
@@ -40,7 +40,7 @@ public class LeaderFSM : MonoBehaviour
         _fsm = new FSMLeaderStates();
 
         LeaderStateFormation formation = new(_fsm, this, _boid, aStarManager);
-        LeaderStateAttack attack = new(_fsm, this, _rigidbody, _los, maxVelocity, timePrediction, _steeringEntity);
+        LeaderStateAttack attack = new(_fsm, this, _rigidbody, _los, _obstacelAvoid, maxVelocity, timePrediction, _steeringEntity);
         LeaderStateEvade evade = new(_fsm, this, _rigidbody, _steeringEntity, _obstacelAvoid, _los, maxVelocity, timePrediction);
         LeaderStateHeal heal = new(_fsm, this);
         LeaderStatePause pause = new(_fsm, this);
@@ -113,13 +113,75 @@ public class LeaderFSM : MonoBehaviour
 
     public void HealTroop()
     {
+        List<IAFSM> candidates = new();
+        List<float> weights = new();
+
         foreach (IAFSM soldier in myTroop)
         {
             if (soldier == null) continue;
-            FSMIASoldiers fsm = soldier.fsm;
-            fsm.lives = Mathf.Min(fsm.lives + 1, 10);
+
+            int life = soldier.fsm.lives;
+            candidates.Add(soldier);
+
+            float weight = 0f;
+
+            if (life <= 3) 
+                weight = 6f;
+            else if (life <= 6) 
+                weight = 3f;
+            else
+                weight = 1f;
+
+            weights.Add(weight);
         }
+
+        IAFSM selected = WeightedRandomSelection(candidates, weights);
+        if (selected == null) return;
+
+        int currentLife = selected.fsm.lives;
+
+        int healAmount = 0;
+        if (currentLife <= 3)
+        {
+            healAmount = Random.Range(3, 6);
+        }
+        else if (currentLife <= 6)
+        {
+            healAmount = Random.Range(1, 4);
+        }
+        else
+        {
+            healAmount = Random.Range(0, 2); 
+        }
+
+        selected.fsm.lives = Mathf.Min(10, selected.fsm.lives + healAmount);
+
+        Debug.Log($"Leader curó a {selected.name} con {healAmount} puntos de vida (ahora tiene {selected.fsm.lives})");
     }
+
+    private IAFSM WeightedRandomSelection(List<IAFSM> candidates, List<float> weights)
+    {
+        if (candidates.Count != weights.Count || candidates.Count == 0)
+            return null;
+
+        float totalWeight = 0f;
+        foreach (float w in weights) totalWeight += w;
+
+        float randomValue = Random.Range(0f, totalWeight);
+        float cumulative = 0f;
+
+        for (int i = 0; i < candidates.Count; i++)
+        {
+            cumulative += weights[i];
+            if (randomValue <= cumulative)
+            {
+                return candidates[i];
+            }
+        }
+
+        return candidates[candidates.Count - 1]; // fallback
+    }
+
 
     public void ReceiveHit()
     {
