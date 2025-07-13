@@ -100,4 +100,23 @@ public class AStarManager : MonoBehaviour
             from.connections.Add(to);
 
     }
+
+    public Node GetClosestNode(Vector3 position)
+    {
+        Node[] allNodes = FindObjectsOfType<Node>();
+        Node closest = null;
+        float minDist = float.MaxValue;
+
+        foreach (Node node in allNodes)
+        {
+            float dist = Vector3.Distance(position, node.transform.position);
+            if (dist < minDist)
+            {
+                minDist = dist;
+                closest = node;
+            }
+        }
+
+        return closest;
+    }
 }

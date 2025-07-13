@@ -14,7 +14,7 @@ public class IAFSM : MonoBehaviour
     private Rigidbody rb;
     private Boid boid;
     private SteeringEntity steering;
-    private FSMIASoldiers fsm;
+    public FSMIASoldiers fsm;
     private LineOfSight los;
     private ObstacleAvoid obstacleAvoid;
 

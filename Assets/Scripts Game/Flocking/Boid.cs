@@ -12,7 +12,9 @@ public class Boid : SteeringBase
     [SerializeField, Range(0, 1f)] float cohesionWheight;
     [SerializeField, Range(0, 1f)] float alignmentWheight;
     [SerializeField] LayerMask boids;
-    
+
+    public bool isLeader = false;
+
     void Start()
     {
         Vector3 dir = new Vector3(Random.Range(-1, 1), 0, Random.Range(-1, 1));
@@ -21,7 +23,7 @@ public class Boid : SteeringBase
 
     void Update()
     {
-        Flocking();
+        if (!isLeader) Flocking();
         Move();
     }
 

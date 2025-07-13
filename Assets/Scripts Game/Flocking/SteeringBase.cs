@@ -19,9 +19,9 @@ public class SteeringBase : MonoBehaviour
         return Vector3.ClampMagnitude(steering, _maxForce * Time.deltaTime);
     }
 
-    protected void AddForce(Vector3 force) => _velocity = Vector3.ClampMagnitude(_velocity + force, _maxSpeed);
+    public void AddForce(Vector3 force) => _velocity = Vector3.ClampMagnitude(_velocity + force, _maxSpeed);
 
-    protected void Move()
+    public void Move()
     {
         if(_velocity == Vector3.zero) return;
 
