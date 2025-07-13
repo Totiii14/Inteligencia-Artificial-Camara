@@ -1,6 +1,5 @@
 using UnityEngine;
 using System.Collections.Generic;
-using static LeaderStatesEnum;
 using static SoldierStatesEnum;
 
 public class LeaderFSM : MonoBehaviour
@@ -9,6 +8,11 @@ public class LeaderFSM : MonoBehaviour
     [SerializeField] float detectionRadius = 15f;
     public LayerMask enemyMask;
     [SerializeField] float regroupDuration = 5f;
+
+    [Header("Troop Spawn")]
+    [SerializeField] private GameObject soldierPrefab;
+    [SerializeField] private int soldiersToSpawn = 5;
+    [SerializeField] private Transform spawnPoint;
 
     [SerializeField] private Transform enemyLeaderTarget;
     public Transform EnemyLeaderTarget => enemyLeaderTarget;
@@ -39,7 +43,7 @@ public class LeaderFSM : MonoBehaviour
 
         _fsm = new FSMLeaderStates();
 
-        LeaderStateFormation formation = new(_fsm, this, _boid, aStarManager);
+        LeaderStateFormation formation = new(_fsm, this, _boid, aStarManager, _obstacelAvoid);
         LeaderStateAttack attack = new(_fsm, this, _rigidbody, _los, _obstacelAvoid, maxVelocity, timePrediction, _steeringEntity);
         LeaderStateEvade evade = new(_fsm, this, _rigidbody, _steeringEntity, _obstacelAvoid, _los, maxVelocity, timePrediction);
         LeaderStateHeal heal = new(_fsm, this);
@@ -68,6 +72,7 @@ public class LeaderFSM : MonoBehaviour
 
     private void Start()
     {
+        SpawnTroop();
     }
 
     private void Update()
@@ -241,5 +246,35 @@ public class LeaderFSM : MonoBehaviour
         }
 
         return closest;
+    }
+
+    public void CommandRegroup()
+    {
+        foreach (IAFSM soldier in myTroop)
+        {
+            if (soldier == null) continue;
+
+            if (soldier.fsm != null && soldier.fsm.GetCurrentState() is SoldierStateSearching searchingState)
+            {
+                searchingState.SetRegroupTarget(transform);
+            }
+        }
+    }
+
+    private void SpawnTroop()
+    {
+        for (int i = 0; i < soldiersToSpawn; i++)
+        {
+            Vector3 offset = Random.insideUnitSphere * 2f;
+            offset.y = 0;
+
+            GameObject soldierGO = Instantiate(soldierPrefab, spawnPoint.position + offset, Quaternion.identity);
+            IAFSM soldier = soldierGO.GetComponent<IAFSM>();
+
+            if (soldier != null)
+            {
+                myTroop.Add(soldier);
+            }
+        }
     }
 }

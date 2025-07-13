@@ -39,4 +39,9 @@ public class FSMIASoldiers
     {
         IsEvading = value;
     }
+
+    public State GetCurrentState()
+    {
+        return _currentState;
+    }
 }

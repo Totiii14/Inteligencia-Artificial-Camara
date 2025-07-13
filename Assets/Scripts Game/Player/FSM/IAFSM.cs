@@ -9,7 +9,7 @@ public class IAFSM : MonoBehaviour
 
     [SerializeField] float maxVelocity;
     [SerializeField] float timePrediction;
-    [SerializeField] AStarManager AStarManager;
+    AStarManager AStarManager;
 
     private Rigidbody rb;
     private Boid boid;
@@ -25,6 +25,8 @@ public class IAFSM : MonoBehaviour
         steering = GetComponent<SteeringEntity>();  
         los = GetComponent<LineOfSight>();
         obstacleAvoid = GetComponent<ObstacleAvoid>();
+
+        AStarManager = FindObjectOfType<AStarManager>();
     }
 
     private void Start()
@@ -34,7 +36,7 @@ public class IAFSM : MonoBehaviour
         fsm = new FSMIASoldiers();
 
         
-        SoldierStateSearching searching = new SoldierStateSearching(fsm, boid, AStarManager, rb, los, enemyTag);
+        SoldierStateSearching searching = new SoldierStateSearching(fsm, boid, AStarManager, rb, los, obstacleAvoid, enemyTag);
         SoldierStateChasing chasing = new SoldierStateChasing(fsm, steering, rb, obstacleAvoid, transform, los, maxVelocity, timePrediction);
         SoldierStateEvading evading = new SoldierStateEvading(fsm, steering, rb, obstacleAvoid, transform, maxVelocity, timePrediction);
 

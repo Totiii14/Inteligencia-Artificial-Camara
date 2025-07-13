@@ -8,7 +8,7 @@ public class SoldierStateSearching : State
     private FSMIASoldiers _fsm;
     private Rigidbody _rb;
     private Boid _boid;
-
+    private ObstacleAvoid _obstacleAvoid;
     private LineOfSight lineOfSight;
     private float detectionRadius = 10f;
     private string enemyTag;
@@ -22,12 +22,16 @@ public class SoldierStateSearching : State
 
     private Transform currentTarget;
 
-    public SoldierStateSearching(FSMIASoldiers fsm, Boid boid, AStarManager aStar, Rigidbody rb, LineOfSight los, string enemyTag)
+    private bool shouldRegroup = false;
+    private Transform regroupTarget = null;
+
+    public SoldierStateSearching(FSMIASoldiers fsm, Boid boid, AStarManager aStar, Rigidbody rb, LineOfSight los, ObstacleAvoid obstacleAvoid, string enemyTag)
     {
         _fsm = fsm;
         _boid = boid;
         _rb = rb;
         _aStar = aStar;
+        _obstacleAvoid = obstacleAvoid;
         this.lineOfSight = los;
         this.enemyTag = enemyTag;
     }
@@ -43,6 +47,24 @@ public class SoldierStateSearching : State
     public override void Execute()
     {
         searchTimer += Time.deltaTime;
+
+        if (shouldRegroup && regroupTarget != null)
+        {
+            Vector3 dir = (regroupTarget.position - _rb.position).normalized;
+            Vector3 avoidForce = _obstacleAvoid.GetAvoidDirection();
+            Vector3 finalDir = dir * 10f + avoidForce;
+
+            _boid.AddForce(finalDir);
+            _boid.Move();
+
+            if (Vector3.Distance(_rb.position, regroupTarget.position) <= 2f)
+            {
+                shouldRegroup = false; 
+                regroupTarget = null;
+            }
+
+            return; 
+        }
 
         Collider[] colliders = Physics.OverlapSphere(_rb.position, detectionRadius);
 
@@ -92,13 +114,23 @@ public class SoldierStateSearching : State
         {
             Node targetNode = pathToEnemy[pathIndex];
             Vector3 dir = (targetNode.transform.position - _rb.position).normalized;
-            _boid.AddForce(dir * 10f); 
+            Vector3 avoidForce = _obstacleAvoid.GetAvoidDirection();
+            Vector3 finalDir = dir * 10f + avoidForce;
+
+            _boid.AddForce(finalDir);
             _boid.Move();
 
             float dist = Vector3.Distance(_rb.position, targetNode.transform.position);
             if (dist <= 0.5f)
             {
                 pathIndex++;
+            }
+
+            if (pathIndex >= pathToEnemy.Count)
+            {
+                pathToEnemy.Clear();
+                pathIndex = 0;
+                searchTimer = searchTimeout; 
             }
         }
     }
@@ -108,6 +140,12 @@ public class SoldierStateSearching : State
         GameObject[] enemies = GameObject.FindGameObjectsWithTag(enemyTag);
         if (enemies.Length == 0) return null;
         return enemies[Random.Range(0, enemies.Length)].transform;
+    }
+
+    public void SetRegroupTarget(Transform leader)
+    {
+        regroupTarget = leader;
+        shouldRegroup = true;
     }
 
     public override void Sleep()

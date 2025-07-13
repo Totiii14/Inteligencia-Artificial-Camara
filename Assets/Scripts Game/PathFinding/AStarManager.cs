@@ -43,7 +43,6 @@ public class AStarManager : MonoBehaviour
             if (currentNode == end)
             {
                 List<Node> path = new List<Node>();
-
                 path.Insert(0, end);
 
                 while (currentNode != start)
@@ -53,7 +52,8 @@ public class AStarManager : MonoBehaviour
                 }
 
                 path.Reverse();
-                return path;
+
+                return CleanPath(path);
             }
 
             foreach (Node connectedNode in currentNode.connections)
@@ -118,5 +118,43 @@ public class AStarManager : MonoBehaviour
         }
 
         return closest;
+    }
+
+    public List<Node> CleanPath(List<Node> rawPath)
+    {
+        if (rawPath == null || rawPath.Count <= 2)
+            return rawPath;
+
+        List<Node> cleanedPath = new();
+        cleanedPath.Add(rawPath[0]);
+
+        int index = 0;
+
+        while (index < rawPath.Count - 1)
+        {
+            int nextIndex = rawPath.Count - 1;
+
+            for (int i = rawPath.Count - 1; i > index; i--)
+            {
+                if (HasLineOfSight(rawPath[index].transform.position, rawPath[i].transform.position))
+                {
+                    nextIndex = i;
+                    break;
+                }
+            }
+
+            cleanedPath.Add(rawPath[nextIndex]);
+            index = nextIndex;
+        }
+
+        return cleanedPath;
+    }
+
+    private bool HasLineOfSight(Vector3 start, Vector3 end)
+    {
+        Vector3 dir = end - start;
+        float distance = dir.magnitude;
+
+        return !Physics.Raycast(start, dir.normalized, distance, LayerMask.GetMask("Obstacle"));
     }
 }

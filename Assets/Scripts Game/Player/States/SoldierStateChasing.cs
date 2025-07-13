@@ -43,6 +43,7 @@ public class SoldierStateChasing : State
             !_los.CheckAngle(_fsm.Target) ||
             !_los.CheckView(_fsm.Target))
         {
+            _fsm.Target = null;
             _fsm.Transition(SoldiersIAStates.SearchingEnemy);
             return;
         }

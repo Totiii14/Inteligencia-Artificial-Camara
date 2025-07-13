@@ -5,6 +5,7 @@ using UnityEngine;
 public class LeaderStateFormation : LeaderState
 {
     private Boid _boid;
+    private ObstacleAvoid _obstacleAvoid;
     private AStarManager _starManager;
     private List<Node> currentPath;
     private int pathIndex = 0;
@@ -12,12 +13,13 @@ public class LeaderStateFormation : LeaderState
     private float searchTimeout = 8f; // Tiempo máximo de búsqueda
     private float searchTimer = 0f;
 
-    public LeaderStateFormation(FSMLeaderStates fsm, LeaderFSM leader, Boid boid, AStarManager aStar)
+    public LeaderStateFormation(FSMLeaderStates fsm, LeaderFSM leader, Boid boid, AStarManager aStar, ObstacleAvoid avoid)
     {
         _fsm = fsm;
         _leader = leader;
         _boid = boid;
         _starManager = aStar;
+        _obstacleAvoid = avoid;
     }
 
     public override void Awake()
@@ -88,7 +90,10 @@ public class LeaderStateFormation : LeaderState
         // Movimiento hacia el siguiente nodo del path
         Node targetNode = currentPath[pathIndex];
         Vector3 direction = (targetNode.transform.position - _leader.transform.position).normalized;
-        _boid.AddForce(direction * 10f); // Ajustá la fuerza según necesidad
+        Vector3 avoidDir = _obstacleAvoid.GetAvoidDirection();
+
+        Vector3 finalDir = direction * 10f + avoidDir;
+        _boid.AddForce(finalDir);
 
         float distance = Vector3.Distance(_leader.transform.position, targetNode.transform.position);
         if (distance <= reachedNodeThreshold)
@@ -96,7 +101,7 @@ public class LeaderStateFormation : LeaderState
             pathIndex++;
             if (pathIndex >= currentPath.Count)
             {
-                pathIndex = currentPath.Count - 1; // No te pasés
+                pathIndex = currentPath.Count - 1; 
             }
         }
 

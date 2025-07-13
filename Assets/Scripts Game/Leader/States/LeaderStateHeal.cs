@@ -13,7 +13,7 @@ public class LeaderStateHeal : LeaderState
     public override void Awake()
     {
         Debug.Log("Leader: Healing...");
-        timer = 5f;
+        timer = 1f;
         int healsToPerform = 3;
         for (int i = 0; i < healsToPerform; i++)
         {

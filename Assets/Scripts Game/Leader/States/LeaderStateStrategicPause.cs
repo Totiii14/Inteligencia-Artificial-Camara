@@ -14,6 +14,8 @@ public class LeaderStatePause : LeaderState
     {
         pauseTimer = 2f;
         Debug.Log("Leader: Strategic pause");
+
+        _leader.CommandRegroup();
     }
 
     public override void Execute()
