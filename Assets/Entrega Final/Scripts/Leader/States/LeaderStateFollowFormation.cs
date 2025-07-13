@@ -1,0 +1,123 @@
+using System.Collections.Generic;
+using System.Data.Common;
+using UnityEngine;
+
+public class LeaderStateFormation : LeaderState
+{
+    private Boid _boid;
+    private ObstacleAvoid _obstacleAvoid;
+    private Animator _animator;
+    private AStarManager _starManager;
+    private List<Node> currentPath;
+    private int pathIndex = 0;
+    private float reachedNodeThreshold = 0.5f;
+    private float searchTimeout = 8f; // Tiempo máximo de búsqueda
+    private float searchTimer = 0f;
+
+    public LeaderStateFormation(FSMLeaderStates fsm, LeaderFSM leader, Boid boid, AStarManager aStar, ObstacleAvoid avoid, Animator animator)
+    {
+        _fsm = fsm;
+        _leader = leader;
+        _boid = boid;
+        _starManager = aStar;
+        _obstacleAvoid = avoid;
+        _animator = animator;
+    }
+
+    public override void Awake()
+    {
+        _leader.SetFormationActive(true);
+        _boid.enabled = true;
+        _boid.isLeader = true;
+        pathIndex = 0;
+        searchTimer = 0f;
+
+        _animator.SetTrigger("Searching");
+
+        if (_leader.EnemyLeaderTarget != null)
+        {
+            Node startNode = _starManager.GetClosestNode(_leader.transform.position);
+            Node endNode = _starManager.GetClosestNode(_leader.EnemyLeaderTarget.position);
+
+            if (startNode != null && endNode != null)
+            {
+                currentPath = _starManager.GeneratePath(startNode, endNode);
+            }
+
+            for (int i = 0; i < currentPath.Count - 1; i++)
+            {
+                Debug.DrawLine(currentPath[i].transform.position, currentPath[i + 1].transform.position, Color.red);
+            }
+        }
+
+        Debug.Log("Leader: Formation state - moving towards enemy leader");
+    }
+
+    public override void Execute()
+    {
+        searchTimer += Time.deltaTime;
+
+        if (_leader.CanSeeEnemy())
+        {
+            _fsm.Transition(LeaderStateType.Attack);
+            currentPath.Clear();
+            return;
+        }
+
+        if (_leader.ShouldEvade())
+        {
+            _fsm.Transition(LeaderStateType.Evade);
+            currentPath.Clear();
+            return;
+        }
+
+        if (searchTimer >= searchTimeout)
+        {
+            Transform randomEnemy = GetAnyEnemy();
+            if (randomEnemy != null)
+            {
+                Debug.Log("No se encontró enemigo visible, yendo hacia un enemigo random: " + randomEnemy.name);
+                Node startNode = _starManager.GetClosestNode(_leader.transform.position);
+                Node endNode = _starManager.GetClosestNode(randomEnemy.position);
+
+                if (startNode != null && endNode != null)
+                {
+                    currentPath = _starManager.GeneratePath(startNode, endNode);
+                    pathIndex = 0;
+                    searchTimer = 0f; // Reiniciar el tiempo
+                }
+            }
+        }
+
+        if (currentPath == null || currentPath.Count == 0) return;
+
+        // Movimiento hacia el siguiente nodo del path
+        Node targetNode = currentPath[pathIndex];
+        Vector3 direction = (targetNode.transform.position - _leader.transform.position).normalized;
+        Vector3 avoidDir = _obstacleAvoid.GetAvoidDirection();
+
+        Vector3 finalDir = direction * 10f + avoidDir;
+        _boid.AddForce(finalDir);
+
+        float distance = Vector3.Distance(_leader.transform.position, targetNode.transform.position);
+        if (distance <= reachedNodeThreshold)
+        {
+            pathIndex++;
+            if (pathIndex >= currentPath.Count)
+            {
+                pathIndex = currentPath.Count - 1; 
+            }
+        }
+
+        _boid.Move();
+    }
+
+    private Transform GetAnyEnemy()
+    {
+        Collider[] colliders = Physics.OverlapSphere(_leader.transform.position, 100f, _leader.enemyMask);
+        if (colliders.Length == 0) return null;
+
+        int index = Random.Range(0, colliders.Length);
+        return colliders[index].transform;
+    }
+}
